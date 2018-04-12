@@ -1,6 +1,10 @@
 package com.transvision.mbc;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -11,14 +15,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.transvision.mbc.fragments.MainFragment;
 import com.transvision.mbc.fragments.SendSubdivCode;
-import com.transvision.mbc.fragments.billing.Billing_Contents;
 import com.transvision.mbc.values.GetSetValues;
 
 import java.util.ArrayList;
@@ -32,10 +37,10 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ArrayList<String> main_tabs_list;
     String subdiv;
-
+    String current_version="";
     public enum Steps {
-        FORM0(MainFragment.class),
-        FORM1(Billing_Contents.class),
+        //FORM0(MainFragment.class),
+        //FORM1(Billing_Contents.class),
         FORM2(SendSubdivCode.class);
 
         private Class clazz;
@@ -53,6 +58,14 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PackageInfo packageInfo;
+        try {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            current_version = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         Intent intent = getIntent();
         //getSetValues = (GetSetValues) intent.getSerializableExtra(GETSET);
@@ -78,7 +91,12 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView logout_navigationView = (NavigationView) findViewById(R.id.nav_drawer_bottom);
         logout_navigationView.setNavigationItemSelectedListener(this);
-
+        Menu menu = logout_navigationView.getMenu();
+        MenuItem nav_version = menu.findItem(R.id.nav_versioncode);
+        //below line is for disableing the nav_versioncode click
+        nav_version.setEnabled(false);
+        nav_version.setTitle("Version: "+current_version);
+        logout_navigationView.setItemTextColor(ColorStateList.valueOf(Color.parseColor("#039BE5")));
         switchContent(Steps.FORM2, getResources().getString(R.string.app_name));
 
     }
@@ -147,20 +165,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_main:
-               /* Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(GETSET, getSetValues);
-                startActivity(intent);*/
                 switchContent(Steps.FORM2, getResources().getString(R.string.login));
                 break;
-            /*case R.id.nav_login:
-                //switchContent(Steps.FORM1, getResources().getString(R.string.login));
-                break;
-            case R.id.nav_demo1:
-                //switchContent(Steps.FORM3, getResources().getString(R.string.demo1));
-                //Toast.makeText(this, "To be implemented later..", Toast.LENGTH_SHORT).show();
-                //switchContent(Steps.FORM2, "Demo1");
-                break;*/
             case R.id.nav_logout:
                 Intent intent = new Intent(MainActivity.this, ActivityLogin2.class);
                 startActivity(intent);
@@ -173,11 +179,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void setMargins(View view, int left, int top, int right, int bottom) {
-        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-            p.setMargins(left, top, right, bottom);
-            view.requestLayout();
-        }
-    }
 }

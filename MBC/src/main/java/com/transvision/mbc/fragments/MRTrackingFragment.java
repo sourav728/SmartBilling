@@ -2,6 +2,7 @@ package com.transvision.mbc.fragments;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.R;
@@ -163,6 +167,9 @@ public class MRTrackingFragment extends Fragment {
         mi.inflate(R.menu.location,menu);
         MenuItem search = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+       // searchView.setQueryHint("Search by Mrcode..");
+        //below line is for searchview hint and hint color
+        searchView.setQueryHint(Html.fromHtml("<font color = #212121>" + "Search by Mrcode.." + "</font>"));
         search(searchView);
        // inflater.inflate(R.menu.location, menu);
         super.onCreateOptionsMenu(menu, inflater);

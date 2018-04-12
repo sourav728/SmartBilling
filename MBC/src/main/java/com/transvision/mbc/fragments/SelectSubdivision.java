@@ -1,8 +1,11 @@
 package com.transvision.mbc.fragments;
 
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -48,7 +51,9 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Created by Sourav
  */
+
 public class SelectSubdivision extends Fragment {
+    private static final int PROGRESS_HOLD = 1;
     Button submit;
     FragmentTransaction fragmentTransaction;
     Spinner subdivspinner;
@@ -58,7 +63,7 @@ public class SelectSubdivision extends Fragment {
     String main_role = "";
     ArrayList<GetSetValues> arrayList;
     String dum = "", dd = "", day = "", flag = "";
-
+    ProgressDialog progressDialog;
     public SelectSubdivision() {
 
     }
@@ -232,6 +237,12 @@ public class SelectSubdivision extends Fragment {
         String response = "";
 
         @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getActivity(),"Loading","Loading Please wait..",true);
+            super.onPreExecute();
+        }
+
+        @Override
         protected String doInBackground(String... params) {
             try {
                 response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/Subdivision_Details");
@@ -255,10 +266,14 @@ public class SelectSubdivision extends Fragment {
                         getSet.setLogin_role(subdivisionname);
                         role_list.add(getSet);
                         roleAdapter.notifyDataSetChanged();
+                        if (progressDialog.isShowing())
+                            progressDialog.dismiss();
                     }
                 }
             } catch (JSONException e) {
                 Toast.makeText(getActivity(), "No Value Found!!", Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
             }
             super.onPostExecute(s);
         }

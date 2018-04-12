@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -77,11 +78,12 @@ public class Collection_Details extends Fragment {
     private Calendar mcalender;
     ArrayList<GetSetValues> collection_list;
     GetSetValues getsetvalues;
-    String Counter="",ReceiptCount="",Amount="",Mode="",MRNAME="",MOBILENO="",LATITUDE="",LONGITUDE="", Date="", Approved_flag ="", Flag="";
+    String Counter = "", ReceiptCount = "", Amount = "", Mode = "", MRNAME = "", MOBILENO = "", LATITUDE = "", LONGITUDE = "", Date = "", Approved_flag = "", Flag = "";
     ArrayList<HashMap<String, String>> contactList;
     ArrayList<GetSetValues> arrayList;
     private CollectionAdapter collectionAdapter;
     private Toolbar toolbar;
+    Menu menu;
     public Collection_Details() {
 
     }
@@ -122,8 +124,7 @@ public class Collection_Details extends Fragment {
 
 
         Bundle bundle = getArguments();
-        if (bundle!= null)
-        {
+        if (bundle != null) {
             subdivisioncode = bundle.getString("subdivcode");
         }
 
@@ -145,19 +146,13 @@ public class Collection_Details extends Fragment {
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (fromdate.getText().toString().equals("")|| todate.getText().toString().equals(""))
-                {
-                    if (fromdate.getText().toString().equals(""))
-                    {
+                if (fromdate.getText().toString().equals("") || todate.getText().toString().equals("")) {
+                    if (fromdate.getText().toString().equals("")) {
                         Toast.makeText(getActivity(), "Please Select from date!!", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(getActivity(), "Please Select to date!!", Toast.LENGTH_SHORT).show();
                     }
-                }
-                else
-                {
+                } else {
                     show_hide.setVisibility(View.GONE);
                     ConnectURL connectURL = new ConnectURL();
                     connectURL.execute();
@@ -170,14 +165,19 @@ public class Collection_Details extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuInflater mi = getActivity().getMenuInflater();
+       /* MenuInflater mi = getActivity().getMenuInflater();
         mi.inflate(R.menu.toolbar_menu, menu);
         MenuItem search = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
-
+        search(searchView);
+        super.onCreateOptionsMenu(menu, inflater);*/
+        MenuInflater mi = getActivity().getMenuInflater();
+        mi.inflate(R.menu.collection, menu);
+        MenuItem search = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        searchView.setQueryHint(Html.fromHtml("<font color = #212121>" + "Search by Counter.." + "</font>"));
         search(searchView);
         super.onCreateOptionsMenu(menu, inflater);
-
     }
 
     @Override
@@ -185,21 +185,18 @@ public class Collection_Details extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public class ConnectURL extends AsyncTask<String,String,String>
-    {
+    public class ConnectURL extends AsyncTask<String, String, String> {
         String response = "";
+
         @Override
         protected String doInBackground(String... params) {
             HashMap<String, String> datamap = new HashMap<>();
             datamap.put("subdivcode", "540038");
             datamap.put("FromDate", date1);
             datamap.put("ToDate", date2);
-            try
-            {
+            try {
                 response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/CollectionSummary", datamap);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return response;
@@ -212,10 +209,8 @@ public class Collection_Details extends Fragment {
 
             try {
                 jsonarray = new JSONArray(res);
-                if (jsonarray.length()>0)
-                {
-                    for (int i=0;i< jsonarray.length(); i++)
-                    {
+                if (jsonarray.length() > 0) {
+                    for (int i = 0; i < jsonarray.length(); i++) {
                         JSONObject jsonObject = jsonarray.getJSONObject(i);
                         /**************Whenever we are using getter setter for setting values we have to initialize getter setter inside for loop*********/
                         getsetvalues = new GetSetValues();
@@ -225,8 +220,8 @@ public class Collection_Details extends Fragment {
                         Mode = jsonObject.getString("Mode");
                         MRNAME = jsonObject.getString("MRNAME");
                         MOBILENO = jsonObject.getString("MOBILENO");
-                        LATITUDE =jsonObject.getString("LATITUDE");
-                        LONGITUDE=jsonObject.getString("LONGITUDE");
+                        LATITUDE = jsonObject.getString("LATITUDE");
+                        LONGITUDE = jsonObject.getString("LONGITUDE");
                         //Approved flag and date is not there in service
                         Date = jsonObject.getString("date");
                         Approved_flag = jsonObject.getString("Approved_flag");
@@ -237,61 +232,42 @@ public class Collection_Details extends Fragment {
                         else
                             Flag = "Not Approved";
 
-                        Log.d("Debug","Counter"+Counter);
-                        Log.d("Debug","ReceiptCount"+ReceiptCount);
-                        Log.d("Debug", "Amount"+Amount);
-                        Log.d("Debug","Mode"+Mode);
+                        Log.d("Debug", "Counter" + Counter);
+                        Log.d("Debug", "ReceiptCount" + ReceiptCount);
+                        Log.d("Debug", "Amount" + Amount);
+                        Log.d("Debug", "Mode" + Mode);
 
-                        if (!Counter.equals(""))
-                        {
+                        if (!Counter.equals("")) {
                             getsetvalues.setCounter(Counter);
-                        }
-                        else getsetvalues.setCounter("NA");
-                        if (!ReceiptCount.equals(""))
-                        {
+                        } else getsetvalues.setCounter("NA");
+                        if (!ReceiptCount.equals("")) {
                             getsetvalues.setReceiptcount(ReceiptCount);
-                        }
-                        else getsetvalues.setReceiptcount("NA");
-                        if (!Amount.equals(""))
-                        {
+                        } else getsetvalues.setReceiptcount("NA");
+                        if (!Amount.equals("")) {
                             getsetvalues.setReceipt_amount(Amount);
-                        }
-                        else getsetvalues.setReceipt_amount("NA");
-                        if (!Mode.equals(""))
-                        {
+                        } else getsetvalues.setReceipt_amount("NA");
+                        if (!Mode.equals("")) {
                             getsetvalues.setMode(Mode);
-                        }
-                        else getsetvalues.setMode("NA");
-                        if (!MRNAME.equals(""))
-                        {
+                        } else getsetvalues.setMode("NA");
+                        if (!MRNAME.equals("")) {
                             getsetvalues.setMrname(MRNAME);
-                        }
-                        else getsetvalues.setMrname("NA");
-                        if (!MOBILENO.equals(""))
-                        {
+                        } else getsetvalues.setMrname("NA");
+                        if (!MOBILENO.equals("")) {
                             getsetvalues.setMobileno(MOBILENO);
-                        }
-                        else getsetvalues.setMobileno("NA");
-                        if (!LATITUDE.equals(""))
-                        {
+                        } else getsetvalues.setMobileno("NA");
+                        if (!LATITUDE.equals("")) {
                             getsetvalues.setLatitude(LATITUDE);
-                        }
-                        else getsetvalues.setLatitude("NA");
-                        if (!LONGITUDE.equals(""))
-                        {
+                        } else getsetvalues.setLatitude("NA");
+                        if (!LONGITUDE.equals("")) {
                             getsetvalues.setLongitude(LONGITUDE);
-                        }
-                        else getsetvalues.setLongitude("NA");
+                        } else getsetvalues.setLongitude("NA");
 
-                        if (!Date.equals(""))
-                        {
+                        if (!Date.equals("")) {
                             getsetvalues.setDate(Date);
-                        }
-                        else getsetvalues.setDate(Date);
-                        if (!Approved_flag.equals(""))
-                        {
+                        } else getsetvalues.setDate(Date);
+                        if (!Approved_flag.equals("")) {
                             getsetvalues.setApproved_flag(Flag);
-                        }else getsetvalues.setApproved_flag("NA");
+                        } else getsetvalues.setApproved_flag("NA");
 
                         arrayList.add(getsetvalues);
                         collectionAdapter.notifyDataSetChanged();
@@ -303,9 +279,7 @@ public class Collection_Details extends Fragment {
 
                 } else Toast.makeText(getActivity(), "Failure!!", Toast.LENGTH_SHORT).show();
 
-            }
-            catch (JSONException e)
-            {
+            } catch (JSONException e) {
                 //Code for going back to previous fragment here addtoBackStack will not work cause listview and full design are in same page
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 fm.popBackStack();
@@ -320,7 +294,7 @@ public class Collection_Details extends Fragment {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-" + dayOfMonth);
                 date1 = functionsCall.Parse_Date2(dd);
                 fromdate.setText(date1);
             }
@@ -333,7 +307,7 @@ public class Collection_Details extends Fragment {
         DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-" + dayOfMonth);
                 date2 = functionsCall.Parse_Date2(dd);
                 todate.setText(date2);
             }
@@ -424,8 +398,7 @@ public class Collection_Details extends Fragment {
         return value;
     }
 
-    private void search(SearchView searchView)
-    {
+    private void search(SearchView searchView) {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

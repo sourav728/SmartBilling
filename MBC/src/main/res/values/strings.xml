@@ -133,7 +133,7 @@
 
     <string name="main">Main</string>
     <string name="view_all_location">View_All_Location</string>
-    <string name="login">Login</string>
+    <string name="login">MBC_Insight</string>
     <string name="login_message">Login....Please Wait...</string>
     <string name="dialog_login_password_error">Enter password!!</string>
     <string name="dialog_login_id_error">Enter Subdiv code!!</string>

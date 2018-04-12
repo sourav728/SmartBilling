@@ -24,7 +24,7 @@ import com.transvision.mbc.values.GetSetValues;
 import java.util.ArrayList;
 
 /**
- * Created by Sourav 
+ * Created by Sourav
  */
 
 public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> implements Filterable{

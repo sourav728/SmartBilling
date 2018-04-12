@@ -116,7 +116,7 @@ public class ShowMrDetails extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show_mr_details, container, false);
-
+        getActivity().setTitle("MR Time Stamp");
         // pdf = (Button) view.findViewById(R.id.btn_pdf);
 
         show_date = (TextView) view.findViewById(R.id.txt_showdate);

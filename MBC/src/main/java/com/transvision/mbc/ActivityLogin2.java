@@ -7,13 +7,17 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -26,6 +30,7 @@ import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
@@ -49,6 +54,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
+
 /**
  * Created by Sourav
  */
@@ -56,6 +62,9 @@ public class ActivityLogin2 extends AppCompatActivity {
     private static final int DLG_LOGIN = 4;
     private static final int SUB_DIV_LOGIN_SUCCESS = 1;
     private static final int SUB_DIV_LOGIN_FAILURE = 2;
+    private static final int SERVER_TIME_OUT = 3;
+    private static final int LOGIN_SUCCESS = 4;
+    private static final int LOGIN_FAILURE = 5;
     Spinner role_spinner;
     ProgressDialog progressDialog;
     String code, password;
@@ -66,19 +75,48 @@ public class ActivityLogin2 extends AppCompatActivity {
     Button login_btn;
     String main_role = "";
     String requestUrl = "";
-    String group = "", current_version="";
+    String group = "", current_version = "";
     TextView version_code;
+    static ProgressDialog progressdialog;
+    private Handler handler = null;
+
+    {
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case LOGIN_SUCCESS:
+                        progressDialog.dismiss();
+                        Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
+                        intent.putExtra("subdivcode", code);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    case LOGIN_FAILURE:
+                        //Toast.makeText(ActivityLogin2.this, "Login Failure!!", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow(); // in Activity's onCreate() for instance
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
         initialize();
 
         PackageInfo packageInfo;
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             current_version = packageInfo.versionName;
-            version_code.setText(current_version);
+            //version_code.setText(current_version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -95,28 +133,6 @@ public class ActivityLogin2 extends AppCompatActivity {
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              /*  Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (fcall.isInternetOn(ActivityLogin2.this))
-                        {
-                            *//*if (main_role.equalsIgnoreCase("Corporate")) {
-                                Intent intent = new Intent(LoginActivity2.this,CorporateActivity.class);
-                                startActivity(intent);
-                            } else if (main_role.equalsIgnoreCase("Subdivision")) {
-                                Intent intent = new Intent(LoginActivity2.this,SubdivisionActivity.class);
-                                startActivity(intent);
-                            } else Toast.makeText(LoginActivity2.this,"Select Corporate or Subdivision",Toast.LENGTH_SHORT).show();*//*
-                            Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
-                            startActivity(intent);
-                        }
-                        else
-                        {
-                            Toast.makeText(ActivityLogin2.this, "Please turn on Internet..", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }, 1000L);*/
 
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                     TextView tvrole = (TextView) findViewById(R.id.spinner_txt);
@@ -152,7 +168,9 @@ public class ActivityLogin2 extends AppCompatActivity {
             case SUB_DIV_LOGIN_FAILURE:
                 progressDialog = progressDialog.show(this, "Fetching details..", "wait", true);
                 break;
-
+            case SERVER_TIME_OUT:
+                Toast.makeText(this, "Server Time out..", Toast.LENGTH_SHORT).show();
+                break;
             case DLG_LOGIN:
                 AlertDialog.Builder login_dlg = new AlertDialog.Builder(this);
                 login_dlg.setTitle(getResources().getString(R.string.dialog_login));
@@ -176,8 +194,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                                 if (!TextUtils.isEmpty(code)) {
                                     password = et_password.getText().toString();
                                     if (!TextUtils.isEmpty(password)) {
+                                        progressDialog = ProgressDialog.show(ActivityLogin2.this, "Login", "Login Please Wait..");
                                         login_dialog.dismiss();
-
                                         ConnectURL connectURL = new ConnectURL();
                                         connectURL.execute(code, password, group);
                                     } else
@@ -211,12 +229,14 @@ public class ActivityLogin2 extends AppCompatActivity {
             datamap.put("username", params[0]);
             datamap.put("userpassword", params[1]);
             datamap.put("Group", params[2]);
-            /*datamap.put("username", code);
-            datamap.put("userpassword", password);*/
             try {
                 requestUrl = UrlPostConnection("http://abc_service.hescomtrm.com/Service.asmx/AndroidUser", datamap);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                /**************The below code is for checking server time out time*************/
+               // showdialog(SERVER_TIME_OUT);
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
             }
             return requestUrl;
         }
@@ -234,45 +254,13 @@ public class ActivityLogin2 extends AppCompatActivity {
             try {
                 jsonObject = new JSONObject(res);
                 String message = jsonObject.getString("message");
-                //  String code = jsonObject.getString("");
                 if (StringUtils.startsWithIgnoreCase(message, "Success")) {
-                  /*  showdialog(SUB_DIV_LOGIN_SUCCESS);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.dismiss();
-                        }
-                    }, 3000);*/
-
-                    Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
-                    //intent.putExtra("subdivcode",code);
-                    intent.putExtra("subdivcode", code);
-                    startActivity(intent);
-                    finish();
-                   /* Toast.makeText(getActivity(), "Success..", Toast.LENGTH_SHORT).show();
-                    SendSubdivCode sendsubdivcode = new SendSubdivCode();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("subdivcode", code);
-                    sendsubdivcode.setArguments(bundle);
-                    fragmentTransaction = getFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.container_main, sendsubdivcode).commit();*/
-
+                    handler.sendEmptyMessage(LOGIN_SUCCESS);
                 } else {
-                    showdialog(SUB_DIV_LOGIN_FAILURE);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.dismiss();
-                        }
-                    }, 3000);
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showdialog(DLG_LOGIN);
-                        }
-                    }, 3000);
-                    Toast.makeText(ActivityLogin2.this, "Invalid Credentials!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityLogin2.this, "Invalid Credentials!!", Toast.LENGTH_SHORT).show();
+                    if (progressDialog.isShowing())
+                        progressDialog.dismiss();
+                    showdialog(DLG_LOGIN);
 
                 }
             } catch (JSONException e) {
@@ -308,6 +296,7 @@ public class ActivityLogin2 extends AppCompatActivity {
         } else {
             response = "";
         }
+
         return response;
     }
 
@@ -372,7 +361,7 @@ public class ActivityLogin2 extends AppCompatActivity {
         role_spinner.setAdapter(roleAdapter);
         login_btn = (Button) findViewById(R.id.login_btn);
         fcall = new FunctionsCall();
-        version_code = (TextView) findViewById(R.id.txt_version_code);
+        //version_code = (TextView) findViewById(R.id.txt_version_code);
     }
 
     @Override

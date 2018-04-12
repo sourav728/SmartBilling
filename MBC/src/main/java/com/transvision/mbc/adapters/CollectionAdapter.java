@@ -95,29 +95,29 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Ti
                 String search = constraint.toString();
                 if (search.isEmpty())
                 {
-                    filteredlist = arrayList;
+                    arrayList = filteredlist;
                 }
                 else
                 {
                     ArrayList<GetSetValues> filterlist = new ArrayList<>();
-                    for (int i=0; i<arrayList.size(); i++)
+                    for (int i=0; i<filteredlist.size(); i++)
                     {
-                        GetSetValues getSetValues = arrayList.get(i);
+                        GetSetValues getSetValues = filteredlist.get(i);
                         if (getSetValues.getCounter().contains(search))
                         {
                             filterlist.add(getSetValues);
                         }
                     }
-                    filteredlist = filterlist;
+                    arrayList = filterlist;
                 }
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = filteredlist;
+                filterResults.values = arrayList;
                 return  filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                filteredlist = (ArrayList<GetSetValues>)results.values;
+                arrayList = (ArrayList<GetSetValues>)results.values;
                 notifyDataSetChanged();
             }
         };
