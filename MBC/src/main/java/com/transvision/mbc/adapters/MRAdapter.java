@@ -55,8 +55,8 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
         holder.mrname.setText(getsetvalues.getMrname());
         holder.mrphone.setText(getsetvalues.getMobileno());
         holder.mriemi.setText(getsetvalues.getDeviceid());
-
         holder.show_hide.setVisibility(View.GONE);
+
         if (currentPosition == position) {
             Animation slideDown = AnimationUtils.loadAnimation(context, R.anim.slide_down);
             holder.show_hide.setVisibility(View.VISIBLE);

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class FunctionsCall {
+
     public String Parse_Date2(String time) {
         String input = "yyyy-MM-d";
         String output = "dd-MM-yyyy";
@@ -115,6 +116,7 @@ public class FunctionsCall {
     public void showtoast(Context context, String Message) {
         Toast.makeText(context, Message, Toast.LENGTH_SHORT).show();
     }
+
     public String filepath(String value) {
         File dir = new File(android.os.Environment.getExternalStorageDirectory(), Appfoldername()
                 + File.separator + value);

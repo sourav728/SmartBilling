@@ -15,11 +15,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -90,6 +94,21 @@ public class ActivityLogin2 extends AppCompatActivity {
                         Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
                         intent.putExtra("subdivcode", code);
                         startActivity(intent);
+                        //Below code is for custom toast message
+                        LayoutInflater inflater = getLayoutInflater();
+                        View layout = inflater.inflate(R.layout.toast,
+                                (ViewGroup) findViewById(R.id.toast_layout));
+                        ImageView imageView = (ImageView) layout.findViewById(R.id.image);
+                        imageView.setImageResource(R.drawable.tick);
+                        TextView textView = (TextView) layout.findViewById(R.id.text);
+                        textView.setText("Success");
+                        textView.setTextSize(20);
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setGravity(Gravity.BOTTOM, 0, 0);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        toast.setView(layout);
+                        toast.show();
+                        //end of custom toast coding
                         finish();
                         break;
                     case LOGIN_FAILURE:
@@ -257,7 +276,21 @@ public class ActivityLogin2 extends AppCompatActivity {
                 if (StringUtils.startsWithIgnoreCase(message, "Success")) {
                     handler.sendEmptyMessage(LOGIN_SUCCESS);
                 } else {
-                    Toast.makeText(ActivityLogin2.this, "Invalid Credentials!!", Toast.LENGTH_SHORT).show();
+                    //below code is for custom toast
+                    LayoutInflater inflater = getLayoutInflater();
+                    View layout = inflater.inflate(R.layout.toast,
+                            (ViewGroup) findViewById(R.id.toast_layout));
+                    ImageView imageView = (ImageView) layout.findViewById(R.id.image);
+                    imageView.setImageResource(R.drawable.invalid);
+                    TextView textView = (TextView) layout.findViewById(R.id.text);
+                    textView.setText("Invalid Credentials!!");
+                    textView.setTextSize(20);
+                    Toast toast = new Toast(getApplicationContext());
+                    toast.setGravity(Gravity.BOTTOM, 0, 0);
+                    toast.setDuration(Toast.LENGTH_SHORT);
+                    toast.setView(layout);
+                    toast.show();
+                    //end of custom toast code
                     if (progressDialog.isShowing())
                         progressDialog.dismiss();
                     showdialog(DLG_LOGIN);
