@@ -2,8 +2,14 @@ package com.transvision.mbc;
 
 
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -14,6 +20,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.adapters.CollectionAdapter;
+import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
@@ -66,12 +74,13 @@ import javax.net.ssl.HttpsURLConnection;
 public class Collection_Details extends Fragment {
 
     RecyclerView recyclerView;
-
+    private BroadcastReceiver mNetworkReceiver;
+    static TextView tv_check_connection;
     ListView lv;
     LinearLayout show_hide;
     TextView fromdate, todate;
     ImageView imagefrom, imageto;
-    Button report;
+    static Button report;
     String dd, date1, date2, subdivisioncode;
     FunctionsCall functionsCall;
     private int day, month, year;
@@ -94,6 +103,11 @@ public class Collection_Details extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_collection__details2, container, false);
         setHasOptionsMenu(true);
+
+       /* tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();*/
+
         fromdate = (TextView) view.findViewById(R.id.txt_fromdate);
         todate = (TextView) view.findViewById(R.id.txt_todate);
         imagefrom = (ImageView) view.findViewById(R.id.img_fromdate);
@@ -162,6 +176,29 @@ public class Collection_Details extends Fragment {
 
         return view;
     }
+
+  /*  public static void dialog3(boolean value){
+        if(value){
+            tv_check_connection.setText("Back Online");
+            tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
+            tv_check_connection.setTextColor(Color.WHITE);
+            Handler handler = new Handler();
+            Runnable delayrunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tv_check_connection.setVisibility(View.GONE);
+                }
+            };
+            handler.postDelayed(delayrunnable, 3000);
+            report.setEnabled(true);
+        }else {
+            tv_check_connection.setVisibility(View.VISIBLE);
+            tv_check_connection.setText("No Internet Connection!!");
+            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setTextColor(Color.WHITE);
+            report.setEnabled(false);
+        }
+    }*/
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -283,7 +320,19 @@ public class Collection_Details extends Fragment {
                 //Code for going back to previous fragment here addtoBackStack will not work cause listview and full design are in same page
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 fm.popBackStack();
-                Toast.makeText(getActivity(), "No Values found!!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "No Values found!!", Toast.LENGTH_SHORT).show();
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View layout = inflater.inflate(R.layout.toast,(ViewGroup) getActivity().findViewById(R.id.toast_layout));
+                ImageView imageView = (ImageView) layout.findViewById(R.id.image);
+                imageView.setImageResource(R.drawable.invalid);
+                TextView textView = (TextView) layout.findViewById(R.id.text);
+                textView.setText("No Records Found!!");
+                textView.setTextSize(20);
+                Toast toast = new Toast(getActivity());
+                toast.setGravity(Gravity.BOTTOM, 0, 0);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                toast.setView(layout);
+                toast.show();
             }
             super.onPostExecute(s);
         }
@@ -412,4 +461,31 @@ public class Collection_Details extends Fragment {
             }
         });
     }
+
+  /*  private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+    protected void unregisterNetworkChanges()
+    {
+        try
+        {
+            getActivity().unregisterReceiver(mNetworkReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkChanges();
+    }*/
 }

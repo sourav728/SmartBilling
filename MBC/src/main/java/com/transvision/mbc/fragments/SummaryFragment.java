@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -245,7 +246,21 @@ public class SummaryFragment extends Fragment {
 
                 if (StringUtils.startsWithIgnoreCase(message, "Failed"))
                 {
-                    Toast.makeText(getActivity(), "No Records Found!!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "No Records Found!!", Toast.LENGTH_SHORT).show();
+                    //below code is for custom toast
+                    LayoutInflater inflater = getActivity().getLayoutInflater();
+                    View layout = inflater.inflate(R.layout.toast,(ViewGroup) getActivity().findViewById(R.id.toast_layout));
+                    ImageView imageView = (ImageView) layout.findViewById(R.id.image);
+                    imageView.setImageResource(R.drawable.invalid);
+                    TextView textView = (TextView) layout.findViewById(R.id.text);
+                    textView.setText("No Records Found!!");
+                    textView.setTextSize(20);
+                    Toast toast = new Toast(getActivity());
+                    toast.setGravity(Gravity.BOTTOM, 0, 0);
+                    toast.setDuration(Toast.LENGTH_SHORT);
+                    toast.setView(layout);
+                    toast.show();
+                    //end of custom toast code
                     fromdate.setText("");
                     todate.setText("");
                 }

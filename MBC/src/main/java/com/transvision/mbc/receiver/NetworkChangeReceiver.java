@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import static com.transvision.mbc.fragments.SelectSubdivision.dialog1;
 import static com.transvision.mbc.fragments.SendSubdivCode.dialog;
 
 /**
@@ -21,11 +22,15 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             if (isOnline(context))
             {
                 dialog(true);
+                dialog1(true);
+                //dialog3(true);
                 Log.d("Debug","You are Online..");
             }
             else
             {
                 dialog(false);
+                dialog1(false);
+               // dialog3(false);
                 Log.d("Debug","Connectivity failure!!");
             }
         }

@@ -2,6 +2,8 @@ package com.transvision.mbc.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 import com.transvision.mbc.Collection_Details;
 import com.transvision.mbc.R;
 import com.transvision.mbc.adapters.RoleAdapter;
+import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.GetSetValues;
 
 import org.json.JSONArray;
@@ -54,7 +57,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class SelectSubdivision extends Fragment {
     private static final int PROGRESS_HOLD = 1;
-    Button submit;
+    static Button submit;
     FragmentTransaction fragmentTransaction;
     Spinner subdivspinner;
     ArrayList<GetSetValues> role_list;
@@ -64,6 +67,9 @@ public class SelectSubdivision extends Fragment {
     ArrayList<GetSetValues> arrayList;
     String dum = "", dd = "", day = "", flag = "";
     ProgressDialog progressDialog;
+    private BroadcastReceiver mNetworkReceiver;
+    static TextView tv_check_connection;
+    static ConnectURL connectURL;
     public SelectSubdivision() {
 
     }
@@ -73,7 +79,8 @@ public class SelectSubdivision extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_subdivision, container, false);
         submit = (Button) view.findViewById(R.id.btn_submit);
-
+        tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
+        mNetworkReceiver = new NetworkChangeReceiver();
         Bundle bundle = getArguments();
 
         subdivspinner = (Spinner) view.findViewById(R.id.subdiv_spin);
@@ -82,7 +89,7 @@ public class SelectSubdivision extends Fragment {
         subdivspinner.setAdapter(roleAdapter);
         arrayList = new ArrayList<>();
 
-        ConnectURL connectURL = new ConnectURL();
+        connectURL = new ConnectURL();
         connectURL.execute();
 
         /*for (int i = 0; i < getResources().getStringArray(R.array.subdivision).length; i++) {
@@ -233,6 +240,29 @@ public class SelectSubdivision extends Fragment {
         return view;
     }
 
+    public static void dialog1(boolean value){
+        if(value){
+            tv_check_connection.setText("Back Online");
+            tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
+            tv_check_connection.setTextColor(Color.WHITE);
+            Handler handler = new Handler();
+            Runnable delayrunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tv_check_connection.setVisibility(View.GONE);
+                }
+            };
+            handler.postDelayed(delayrunnable, 3000);
+            submit.setEnabled(true);
+        }else {
+            tv_check_connection.setVisibility(View.VISIBLE);
+            tv_check_connection.setText("No Internet Connection!!");
+            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setTextColor(Color.WHITE);
+            submit.setEnabled(false);
+        }
+    }
+
     public class ConnectURL extends AsyncTask<String, String, String> {
         String response = "";
 
@@ -356,4 +386,6 @@ public class SelectSubdivision extends Fragment {
         }
         return value;
     }
+
+
 }

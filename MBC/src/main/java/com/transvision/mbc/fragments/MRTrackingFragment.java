@@ -1,10 +1,15 @@
 package com.transvision.mbc.fragments;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -20,12 +25,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.R;
 import com.transvision.mbc.ViewAllLocation;
 import com.transvision.mbc.adapters.MRAdapter;
+import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
@@ -58,7 +65,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class MRTrackingFragment extends Fragment {
     /*ListView lv;*/
     RecyclerView recyclerView;
-
+    private BroadcastReceiver mNetworkReceiver;
     GetSetValues getSetValues, getSet;
     String MRCODE, MRNAME, MOBILE_NO, DEVICE_ID,LONGITUDE,LATITUDE;
     FunctionsCall functionsCall;
@@ -67,7 +74,7 @@ public class MRTrackingFragment extends Fragment {
     ArrayList<GetSetValues> arrayList;
     private MRAdapter mrAdapter;
     String subdivisioncode="";
-
+    //static TextView tv_check_connection;
     public MRTrackingFragment() {
     }
 
@@ -80,7 +87,8 @@ public class MRTrackingFragment extends Fragment {
         subdivspinner = (Spinner) view.findViewById(R.id.subdiv_spin);
         role_list = new ArrayList<>();
         roleAdapter = new RoleAdapter(role_list, getActivity());*/
-
+        mNetworkReceiver = new NetworkChangeReceiver();
+        //tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
         Bundle bundle = getArguments();
         if (bundle!= null)
         {
@@ -363,5 +371,52 @@ public class MRTrackingFragment extends Fragment {
             }
         });
     }
+   /* public static void dialog(boolean value){
+        if(value){
+            tv_check_connection.setText("Back Online");
+            tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
+            tv_check_connection.setTextColor(Color.WHITE);
+            Handler handler = new Handler();
+            Runnable delayrunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tv_check_connection.setVisibility(View.GONE);
+                }
+            };
+            handler.postDelayed(delayrunnable, 3000);
 
+        }else {
+            tv_check_connection.setVisibility(View.VISIBLE);
+            tv_check_connection.setText("No Internet Connection!!");
+            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setTextColor(Color.WHITE);
+
+        }
+    }*/
+
+   /* private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }*/
+    /*protected void unregisterNetworkChanges()
+    {
+        try
+        {
+            getActivity().unregisterReceiver(mNetworkReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterNetworkChanges();
+        super.onDestroy();
+    }*/
 }

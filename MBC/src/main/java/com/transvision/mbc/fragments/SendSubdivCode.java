@@ -302,9 +302,7 @@ public class SendSubdivCode extends Fragment {
 
         return  view;
     }
-
     public static void dialog(boolean value){
-
         if(value){
             tv_check_connection.setText("Back Online");
             tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));

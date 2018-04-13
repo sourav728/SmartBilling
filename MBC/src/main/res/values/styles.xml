@@ -24,4 +24,5 @@
         <item name="colorAccent">@color/green</item> <!-- Whatever color you want-->
     </style>
 
+
 </resources>
