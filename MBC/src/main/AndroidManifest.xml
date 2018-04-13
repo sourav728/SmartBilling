@@ -21,6 +21,7 @@
     <!-- Required to show current location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -62,6 +63,12 @@
         <activity android:name=".ViewAllLocation"/>
         <activity android:name=".CollectionLocation"/>
         <activity android:name="com.transvision.mbc.ActivityLogin2"></activity>
+
+        <receiver android:name=".receiver.NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

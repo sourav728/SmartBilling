@@ -116,7 +116,6 @@ public class FunctionsCall {
     public void showtoast(Context context, String Message) {
         Toast.makeText(context, Message, Toast.LENGTH_SHORT).show();
     }
-
     public String filepath(String value) {
         File dir = new File(android.os.Environment.getExternalStorageDirectory(), Appfoldername()
                 + File.separator + value);

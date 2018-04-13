@@ -1,120 +1,143 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/transitions_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/transitions_container"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     tools:context="com.transvision.mbc.fragments.SendSubdivCode">
 
-    <Button
-        android:visibility="gone"
-        android:id="@+id/btn_date"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="75dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="MR Time Stamp"
-        android:textStyle="bold" />
-
     <LinearLayout
-        android:id="@+id/lin_show_hide"
-        android:visibility="gone"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_date"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="75dp"
+            android:background="@drawable/mybuton"
+            android:text="MR Time Stamp"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/lin_show_hide"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Division"
-            android:textSize="17sp"
-            android:layout_weight="1"/>
-        <Spinner
-            android:id="@+id/subdiv_spin"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"></Spinner>
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Division"
+                android:textSize="17sp" />
+
+            <Spinner
+                android:id="@+id/subdiv_spin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"></Spinner>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/subdiv_code_btn"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="120dp"
+            android:background="@drawable/mybuton"
+            android:text="MR Time Stamp"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/subdiv_summary"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="Billing File Summary"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/dl_mnr_btn"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="DL-MNR Report"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/collection_report_btn"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="Collection Report"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/mr_tracking_btn"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="MR Tracking"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/mr_location_demo"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="Location"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/mr_signal_battery_info"
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/mybuton"
+            android:text="Signalinfo"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
     </LinearLayout>
-    <Button
-        android:id="@+id/subdiv_code_btn"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="120dp"
-        android:background="@drawable/mybuton"
-        android:text="MR Time Stamp"
-        android:textAllCaps="false"
-        android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/subdiv_summary"
-        android:layout_width="275dp"
+    <TextView
+        android:id="@+id/tv_check_connection"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="Billing File Summary"
-        android:textStyle="bold" />
-
-    <Button
-        android:visibility="gone"
-        android:id="@+id/dl_mnr_btn"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="DL-MNR Report"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/collection_report_btn"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="Collection Report"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/mr_tracking_btn"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="MR Tracking"
-        android:textStyle="bold" />
-
-    <Button
-        android:visibility="gone"
-        android:id="@+id/mr_location_demo"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="Location"
-        android:textStyle="bold" />
-    <Button
-        android:visibility="gone"
-        android:id="@+id/mr_signal_battery_info"
-        android:layout_width="275dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:background="@drawable/mybuton"
-        android:text="Signalinfo"
-        android:textStyle="bold" />
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="155dp"
+        android:gravity="center"
+        android:text="Connection establised !"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</RelativeLayout>

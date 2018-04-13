@@ -2,7 +2,12 @@ package com.transvision.mbc.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,11 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.Location;
 import com.transvision.mbc.R;
 import com.transvision.mbc.fragments.billing.DL_MNR_Report;
+import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.FunctionsCall;
 
 import java.util.Calendar;
@@ -29,12 +36,14 @@ public class SendSubdivCode extends Fragment {
 
     private static final int DLG_SUCCESS = 1;
     private static final int DLG_FAILURE = 2;
+    private BroadcastReceiver mNetworkReceiver;
+    static TextView tv_check_connection;
 
     FunctionsCall functionsCall;
     Boolean flag = false;
     int count = 0;
     ProgressDialog progressDialog;
-    Button btn_sendsubdiv_code, btnDatePicker, btn_subdivwise_summary,dl_mnr, collectiondetails, mrtracking, location;
+    static Button btn_sendsubdiv_code, btnDatePicker, btn_subdivwise_summary,dl_mnr, collectiondetails, mrtracking, location;
     String subdiv_code, date, dd, unbilled;
     String subdivisioncode, dum ;
     private int mYear, mMonth, mDay;
@@ -69,6 +78,11 @@ public class SendSubdivCode extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
+
+        tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
+
         btnDatePicker = (Button) view.findViewById(R.id.btn_date);
         dl_mnr = (Button) view.findViewById(R.id.dl_mnr_btn);
         collectiondetails = (Button) view.findViewById(R.id.collection_report_btn);
@@ -289,6 +303,35 @@ public class SendSubdivCode extends Fragment {
         return  view;
     }
 
+    public static void dialog(boolean value){
+
+        if(value){
+            tv_check_connection.setText("Back Online");
+            tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
+            tv_check_connection.setTextColor(Color.WHITE);
+            Handler handler = new Handler();
+            Runnable delayrunnable = new Runnable() {
+                @Override
+                public void run() {
+                    tv_check_connection.setVisibility(View.GONE);
+                }
+            };
+            handler.postDelayed(delayrunnable, 3000);
+            btn_sendsubdiv_code.setEnabled(true);
+            btn_subdivwise_summary.setEnabled(true);
+            collectiondetails.setEnabled(true);
+            mrtracking.setEnabled(true);
+        }else {
+            tv_check_connection.setVisibility(View.VISIBLE);
+            tv_check_connection.setText("No Internet Connection!!");
+            tv_check_connection.setBackgroundColor(Color.RED);
+            tv_check_connection.setTextColor(Color.WHITE);
+            btn_sendsubdiv_code.setEnabled(false);
+            btn_subdivwise_summary.setEnabled(false);
+            collectiondetails.setEnabled(false);
+            mrtracking.setEnabled(false);
+        }
+    }
     private void showdialog(int id)
     {
         switch (id)
@@ -300,5 +343,32 @@ public class SendSubdivCode extends Fragment {
                 progressDialog = ProgressDialog.show(getActivity(),"Wiat for a second...", "Failure", true);
                 break;
         }
+    }
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+    protected void unregisterNetworkChanges()
+    {
+        try
+        {
+            getActivity().unregisterReceiver(mNetworkReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkChanges();
     }
 }
