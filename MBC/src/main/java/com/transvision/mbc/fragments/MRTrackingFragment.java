@@ -204,7 +204,7 @@ public class MRTrackingFragment extends Fragment {
             HashMap<String, String> datamap = new HashMap<>();
             datamap.put("SubDivCode", subdivisioncode);
             try {
-                response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/LGLTMRDETAILS", datamap);
+                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/LGLTMRDETAILS", datamap);
             } catch (Exception e) {
                 e.printStackTrace();
             }

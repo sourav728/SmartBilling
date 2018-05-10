@@ -232,7 +232,7 @@ public class Collection_Details extends Fragment {
             datamap.put("FromDate", date1);
             datamap.put("ToDate", date2);
             try {
-                response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/CollectionSummary", datamap);
+                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/CollectionSummary", datamap);
             } catch (Exception e) {
                 e.printStackTrace();
             }

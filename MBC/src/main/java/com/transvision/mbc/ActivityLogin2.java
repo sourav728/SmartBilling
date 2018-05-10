@@ -249,7 +249,7 @@ public class ActivityLogin2 extends AppCompatActivity {
             datamap.put("userpassword", params[1]);
             datamap.put("Group", params[2]);
             try {
-                requestUrl = UrlPostConnection("http://abc_service.hescomtrm.com/Service.asmx/AndroidUser", datamap);
+                requestUrl = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/AndroidUser", datamap);
             } catch (Exception e) {
                 e.printStackTrace();
                 /**************The below code is for checking server time out time*************/

@@ -275,7 +275,7 @@ public class SelectSubdivision extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/Subdivision_Details");
+                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/Subdivision_Details");
             } catch (Exception e) {
                 e.printStackTrace();
             }

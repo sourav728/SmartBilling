@@ -439,7 +439,7 @@ public class ShowMrDetails extends Fragment {
             datamap.put("Ddate", date);
 
             try {
-                response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/BilledUnbilledDetails", datamap);
+                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/BilledUnbilledDetails", datamap);
             } catch (IOException e) {
                 e.printStackTrace();
             }

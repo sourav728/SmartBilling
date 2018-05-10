@@ -224,7 +224,7 @@ public class SummaryFragment extends Fragment {
             datamap.put("todate",date2 );
             try
             {
-                response = UrlPostConnection("http://www.bc_service.hescomtrm.com/Service.asmx/FilesCount",datamap);
+                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/FilesCount",datamap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
