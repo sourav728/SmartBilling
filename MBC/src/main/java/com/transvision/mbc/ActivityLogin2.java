@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -194,19 +195,21 @@ public class ActivityLogin2 extends AppCompatActivity {
                 AlertDialog.Builder login_dlg = new AlertDialog.Builder(this);
                 login_dlg.setTitle(getResources().getString(R.string.dialog_login));
                 login_dlg.setCancelable(false);
-                LinearLayout dlg_linear = (LinearLayout) this.getLayoutInflater().inflate(R.layout.login_layout, null);
+                RelativeLayout dlg_linear = (RelativeLayout) this.getLayoutInflater().inflate(R.layout.login_layout, null);
                 login_dlg.setView(dlg_linear);
                 final EditText et_loginid = (EditText) dlg_linear.findViewById(R.id.et_login_id);
                 final EditText et_password = (EditText) dlg_linear.findViewById(R.id.et_login_password);
-                login_dlg.setPositiveButton(getResources().getString(R.string.dialog_login), null);
-                login_dlg.setNegativeButton(getResources().getString(android.R.string.cancel), null);
+                final Button login_btn = (Button) dlg_linear.findViewById(R.id.dialog_positive_btn);
+                final Button cancel_btn = (Button) dlg_linear.findViewById(R.id.dialog_negative_btn);
+               /* login_dlg.setPositiveButton(getResources().getString(R.string.dialog_login), null);
+                login_dlg.setNegativeButton(getResources().getString(android.R.string.cancel), null);*/
                 final AlertDialog login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
-                        Button positive = login_dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        Button negative = login_dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                        positive.setOnClickListener(new View.OnClickListener() {
+                       /* Button positive = login_dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button negative = login_dialog.getButton(AlertDialog.BUTTON_NEGATIVE);*/
+                        login_btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 code = et_loginid.getText().toString();
@@ -223,7 +226,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                                     et_loginid.setError(getResources().getString(R.string.dialog_login_id_error));
                             }
                         });
-                        negative.setOnClickListener(new View.OnClickListener() {
+                        cancel_btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 login_dialog.dismiss();
