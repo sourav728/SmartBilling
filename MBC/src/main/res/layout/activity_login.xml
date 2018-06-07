@@ -92,7 +92,6 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="@dimen/dp8"
                 android:gravity="center"
-                android:text="@string/company_details"
                 android:textColor="@color/company_details_color"
                 android:textSize="@dimen/text12"/>
         </LinearLayout>
