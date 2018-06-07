@@ -11,8 +11,7 @@
     <string name="login_btn">Login</string>
 
     <string name="dialog_login">Login</string>
-    <string name="company_details">© 2018 Transvision Software &amp; Data Solutions Pvt Ltd.\n
-        All Rights Reserved\n<u>www.transvisionsolutions.com</u></string>
+  
 
     <string-array name="login_role">
         <item>--SELECT--</item>
