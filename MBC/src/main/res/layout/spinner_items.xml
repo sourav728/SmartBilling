@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp2"
-        android:textStyle="bold"
+        android:singleLine="true"
         android:textAlignment="viewStart"
         android:text="@string/textview"
+        android:scrollbars="none"
         android:textSize="@dimen/text24"/>
 </LinearLayout>

@@ -40,6 +40,7 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
         this.context = context;
         this.filteredList  = arrayList;
         this.getSetValues = getSetValues;
+
     }
 
     @Override

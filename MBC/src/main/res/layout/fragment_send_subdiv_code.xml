@@ -81,6 +81,7 @@
             android:visibility="gone" />
 
         <Button
+            android:visibility="gone"
             android:id="@+id/collection_report_btn"
             android:layout_width="275dp"
             android:layout_height="wrap_content"
