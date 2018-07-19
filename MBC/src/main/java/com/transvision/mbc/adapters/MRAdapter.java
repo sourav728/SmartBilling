@@ -27,25 +27,25 @@ import java.util.ArrayList;
  * Created by Sourav
  */
 
-public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> implements Filterable{
-    String latitude="", longitude="", MRname="", MRcode="";
+public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> implements Filterable {
+    String latitude = "", longitude = "", MRname = "", MRcode = "";
     private static int currentPosition = 0;
-    private ArrayList<GetSetValues>arrayList = new ArrayList<>();
+    private ArrayList<GetSetValues> arrayList = new ArrayList<>();
     private ArrayList<GetSetValues> filteredList;
     private Context context;
     private GetSetValues getSetValues;
-    public MRAdapter(Context context, ArrayList<GetSetValues>arrayList, GetSetValues getSetValues)
-    {
+
+    public MRAdapter(Context context, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues) {
         this.arrayList = arrayList;
         this.context = context;
-        this.filteredList  = arrayList;
+        this.filteredList = arrayList;
         this.getSetValues = getSetValues;
 
     }
 
     @Override
     public TicketHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item3,null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item3, null);
         return new TicketHolder(view);
     }
 
@@ -63,9 +63,7 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
             holder.show_hide.setVisibility(View.VISIBLE);
             holder.show_hide.startAnimation(slideDown);
             holder.expand.setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             holder.expand.setVisibility(View.VISIBLE);
         }
 
@@ -89,7 +87,7 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                String search=constraint.toString();
+                String search = constraint.toString();
                 if (search.isEmpty())
                     arrayList = filteredList;
                 else {
@@ -115,13 +113,13 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
         };
     }
 
-    public class TicketHolder extends RecyclerView.ViewHolder implements View.OnClickListener
-    {
-        TextView mrcode,mrname,mrphone,mriemi;
-       // ImageView phone, location;
+    public class TicketHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView mrcode, mrname, mrphone, mriemi;
+        // ImageView phone, location;
         ImageView expand;
         Button call, location;
         LinearLayout show_hide;
+
         public TicketHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
@@ -148,14 +146,11 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
             switch (v.getId()) {
                 case R.id.btn_call:
                     String no = getsetvalues.getMobileno();
-                    if (!no.equals("NA"))
-                    {
+                    if (!no.equals("NA")) {
                         //code for open the dialer once the dialer icon clicked..
                         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", no, null));
                         context.startActivity(intent);
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(context, "Contact no is not available !!", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -165,17 +160,14 @@ public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> impl
                     longitude = getsetvalues.getLongitude();
                     MRname = getsetvalues.getMrname();
                     MRcode = getsetvalues.getMrcode();
-                    if (!latitude.equals("NA")||!longitude.equals("NA")||!MRname.equals("NA")||!MRcode.equals("NA"))
-                    {
+                    if (!latitude.equals("NA") || !longitude.equals("NA") || !MRname.equals("NA") || !MRcode.equals("NA") || !latitude.equals("") || !longitude.equals("")) {
                         Intent intent = new Intent(context, Location.class);
-                        intent.putExtra("LAT",latitude);
-                        intent.putExtra("LONG",longitude);
-                        intent.putExtra("MRNAME",MRname);
-                        intent.putExtra("MRcode",MRcode);
+                        intent.putExtra("LAT", latitude);
+                        intent.putExtra("LONG", longitude);
+                        intent.putExtra("MRNAME", MRname);
+                        intent.putExtra("MRcode", MRcode);
                         context.startActivity(intent);
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(context, "Location Not available!!!", Toast.LENGTH_SHORT).show();
                     }
                     break;

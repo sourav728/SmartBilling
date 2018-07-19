@@ -112,6 +112,23 @@ public class FunctionsCall {
         return str;
     }
 
+    public String Parse_Date5(String time) {
+        String input = "MM-dd-yyyy";
+        String output = "dd-MM-yyyy";
+        SimpleDateFormat inputFormat = new SimpleDateFormat(input);
+        SimpleDateFormat outputFormat = new SimpleDateFormat(output);
+
+        Date date = null;
+        String str = null;
+        try {
+            date = inputFormat.parse(time);
+            str = outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
+
 
     public void showtoast(Context context, String Message) {
         Toast.makeText(context, Message, Toast.LENGTH_SHORT).show();

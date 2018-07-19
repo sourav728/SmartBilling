@@ -158,7 +158,7 @@ public class SummaryFragment extends Fragment {
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (fromdate.getText().toString().equals("") || todate.getText().toString().equals(""))
+              /*  if (fromdate.getText().toString().equals("") || todate.getText().toString().equals(""))
                 {
                     if (fromdate.getText().toString().equals(""))
                     {
@@ -174,7 +174,16 @@ public class SummaryFragment extends Fragment {
                 {
                     ConnectURL connecturl = new ConnectURL();
                     connecturl.execute();
-                }
+                }*/
+              if(!fromdate.getText().toString().equals(""))
+              {
+                  if (!todate.getText().toString().equals(""))
+                  {
+                      ConnectURL connecturl = new ConnectURL();
+                      connecturl.execute();
+
+                  }else Toast.makeText(getActivity(), "Please Select To date!!", Toast.LENGTH_SHORT).show();
+              }else Toast.makeText(getActivity(), "Please select from date!!", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -220,8 +229,8 @@ public class SummaryFragment extends Fragment {
         protected String doInBackground(String... params) {
             HashMap<String,String> datamap = new HashMap<>();
             datamap.put("subdivcode", subdivisioncode);
-            datamap.put("fromdate",date1);
-            datamap.put("todate",date2 );
+            datamap.put("fromdate",functioncall.Parse_Date5(date1));
+            datamap.put("todate",functioncall.Parse_Date5(date2) );
             try
             {
                 response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/FilesCount",datamap);
