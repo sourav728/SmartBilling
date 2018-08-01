@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,17 +118,6 @@ public class SendSubdivCode extends Fragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 dd =(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                               /* if (mDay<9)
-                                {
-                                    String val = "0";
-                                    dd =(year + "-" + (monthOfYear + 1) + "-" + val+dayOfMonth);
-
-                                }
-                                else
-                                {
-                                    dd =(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
-                                }*/
 
                                 dum = functionsCall.Parse_Date2(dd);
 
@@ -142,36 +132,10 @@ public class SendSubdivCode extends Fragment {
                                 fragmentTransaction = getFragmentManager().beginTransaction();
                                 fragmentTransaction.replace(R.id.container_main,selectSubdivision).addToBackStack(null).commit();
 
-                                // Toast.makeText(getActivity(), "Moveing to next fragment!!", Toast.LENGTH_SHORT).show();
-                                //Clicking on ok button will do the following actions
-
-                               /* ShowMrDetails showMrDetails = new ShowMrDetails();
-                                Bundle bundle = new Bundle();
-
-                                bundle.putString("subdivcode", subdivisioncode);
-                                bundle.putString("date", dum);
-                                bundle.putString("dd",dd);
-                                bundle.putString("daycount", daycount+"");
-
-                                showMrDetails.setArguments(bundle);
-                                fragmentTransaction = getFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.container_main,showMrDetails).addToBackStack(null).commit();
-                                showdialog(DLG_SUCCESS);
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progressDialog.dismiss();
-                                    }
-                                },3000);*/
-
-                                //show_date.setText(":"+dum);
-
                             }
                         }, mYear, mMonth, mDay);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-
                 datePickerDialog.show();
-
 
             }
         });
@@ -204,12 +168,12 @@ public class SendSubdivCode extends Fragment {
 
                                 dum = functionsCall.Parse_Date2(dd);
                                 Toast.makeText(getActivity(), "Moveing to next fragment!!", Toast.LENGTH_SHORT).show();
-                                //show_date.setText(":"+dum);
 
                             }
                         }, mYear, mMonth, mDay);
-                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
 
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                Log.d("Debug","Current Time"+System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });
@@ -217,15 +181,6 @@ public class SendSubdivCode extends Fragment {
         btn_subdivwise_summary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-              /*  SummaryFragment summaryFragment = new SummaryFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("subdivcode",subdivisioncode);
-                summaryFragment.setArguments(bundle);
-                fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main,summaryFragment).addToBackStack(null).commit();
-                // Toast.makeText(getActivity(), "Will be implemented later...", Toast.LENGTH_SHORT).show();*/
-
 
                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                 Bundle bundle = new Bundle();

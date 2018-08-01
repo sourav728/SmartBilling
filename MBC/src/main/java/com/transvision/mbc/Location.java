@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.transvision.mbc.adapters.InfoWindowCustom;
 import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.other.DataParser;
 import com.transvision.mbc.values.GetSetValues;
@@ -134,6 +135,7 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+        mMap.setInfoWindowAdapter(new InfoWindowCustom(this));
     }
 
     protected synchronized void buildGoogleApiClient() {

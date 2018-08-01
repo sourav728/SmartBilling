@@ -196,12 +196,13 @@ public class SummaryFragment extends Fragment {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-                    dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
                 date1 = functioncall.Parse_Date4(dd);
                 fromdate.setText(date1);
             }
         };
         DatePickerDialog dpdialog = new DatePickerDialog(getActivity(), listener, year, month, day);
+        dpdialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         dpdialog.show();
     }
 
@@ -209,15 +210,13 @@ public class SummaryFragment extends Fragment {
         DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
                 date2 = functioncall.Parse_Date4(dd);
                 todate.setText(date2);
             }
         };
         DatePickerDialog dpdialog = new DatePickerDialog(getActivity(), listener, year, month, day);
-        dpdialog.getDatePicker(
-
-        ).setMaxDate(System.currentTimeMillis());
+        dpdialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         dpdialog.show();
     }
 

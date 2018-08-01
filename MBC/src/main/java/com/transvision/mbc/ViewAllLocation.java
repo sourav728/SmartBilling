@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.transvision.mbc.adapters.InfoWindowCustom;
 import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.other.DataParser;
 import com.transvision.mbc.values.GetSetValues;
@@ -92,7 +93,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         setContentView(R.layout.activity_location);
-       // array_list = (ArrayList<GetSetValues>) intent.getSerializableExtra("list");
+        // array_list = (ArrayList<GetSetValues>) intent.getSerializableExtra("list");
         //tvDistanceDuration = (TextView) findViewById(R.id.tv_distance_time);
         duration_text = (TextView) findViewById(R.id.txt_duration_value);
         distance_text = (TextView) findViewById(R.id.txt_distance_value);
@@ -132,6 +133,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+        mMap.setInfoWindowAdapter(new InfoWindowCustom(this));
     }
 
     protected synchronized void buildGoogleApiClient() {
