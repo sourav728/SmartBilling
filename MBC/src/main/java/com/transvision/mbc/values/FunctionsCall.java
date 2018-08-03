@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -14,7 +15,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class FunctionsCall {
-
+    public void logStatus(String message) {
+        Log.d("debug", message);
+    }
     public String Parse_Date2(String time) {
         String input = "yyyy-MM-d";
         String output = "dd-MM-yyyy";

@@ -1,6 +1,8 @@
 package com.transvision.mbc;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -11,8 +13,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,6 +40,7 @@ import com.transvision.mbc.values.GetSetValues;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
@@ -80,7 +85,7 @@ public class ActivityLogin2 extends AppCompatActivity {
     Button login_btn;
     String main_role = "";
     String requestUrl = "";
-    String group = "", current_version = "";
+    String group = "", current_version = "", DeviceID="";
     TextView version_code;
     static ProgressDialog progressdialog;
     private Handler handler = null;
@@ -113,7 +118,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                         finish();
                         break;
                     case LOGIN_FAILURE:
-                        //Toast.makeText(ActivityLogin2.this, "Login Failure!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivityLogin2.this, "Invalid Credentials!!", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                         break;
                 }
@@ -136,40 +141,45 @@ public class ActivityLogin2 extends AppCompatActivity {
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             current_version = packageInfo.versionName;
-            //version_code.setText(current_version);
+            version_code.setText(current_version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < getResources().getStringArray(R.array.login_role2).length; i++) {
-            getSetValues = new GetSetValues();
-            getSetValues.setLogin_role(getResources().getStringArray(R.array.login_role2)[i]);
-            roles_list.add(getSetValues);
-            roleAdapter.notifyDataSetChanged();
-
-        }
-        role_spinner.setSelection(0);
 
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                if (ActivityCompat.checkSelfPermission(ActivityLogin2.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                    //MR Login
+                    //User ID 54003799
+                    //String DeviceID ="354016070557564";
+                    //Password = "12345"
+
+                    //AAO Login
+                    //UserName = 10540038
+                    //DeviceID = "866133033048564";
+                    //Password = "AAO@123"
+
+                    //AEE Login
+                    //UserName =11540037
+                    //Password = CSD1AEE@123
+                    // DeviceID = "866133032881726";
+                    //DeviceID = telephonyManager.getDeviceId();
+                    Log.d("Debug", "Device ID" + DeviceID);
 
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
-                    TextView tvrole = (TextView) findViewById(R.id.spinner_txt);
-                    String role = tvrole.getText().toString();
-                    if (!role.equals("--SELECT--")) {
-                        main_role = role;
-                    }
-                    if (role.equals("AEE")) {
-                        group = "AAO";
                         showdialog(DLG_LOGIN);
-                    }
-                    if (role.equals("AAO")) {
-                        group = "AAO";
-                        showdialog(DLG_LOGIN);
-                    } else {
-                        // Toast.makeText(ActivityLogin2.this, "Please select user role!!", Toast.LENGTH_SHORT).show();
-                    }
                 } else {
                     Toast.makeText(ActivityLogin2.this, "Please connect to internet..", Toast.LENGTH_SHORT).show();
                 }
@@ -201,14 +211,12 @@ public class ActivityLogin2 extends AppCompatActivity {
                 final EditText et_password = (EditText) dlg_linear.findViewById(R.id.et_login_password);
                 final Button login_btn = (Button) dlg_linear.findViewById(R.id.dialog_positive_btn);
                 final Button cancel_btn = (Button) dlg_linear.findViewById(R.id.dialog_negative_btn);
-               /* login_dlg.setPositiveButton(getResources().getString(R.string.dialog_login), null);
-                login_dlg.setNegativeButton(getResources().getString(android.R.string.cancel), null);*/
+
                 final AlertDialog login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
-                       /* Button positive = login_dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        Button negative = login_dialog.getButton(AlertDialog.BUTTON_NEGATIVE);*/
+
                         login_btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -219,7 +227,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                                         progressDialog = ProgressDialog.show(ActivityLogin2.this, "Login", "Login Please Wait..");
                                         login_dialog.dismiss();
                                         ConnectURL connectURL = new ConnectURL();
-                                        connectURL.execute(code, password, group);
+                                        connectURL.execute(code, DeviceID, password);
                                     } else
                                         et_password.setError(getResources().getString(R.string.dialog_login_password_error));
                                 } else
@@ -248,11 +256,11 @@ public class ActivityLogin2 extends AppCompatActivity {
         protected String doInBackground(String... params) {
             HashMap<String, String> datamap = new HashMap<>();
 
-            datamap.put("username", params[0]);
-            datamap.put("userpassword", params[1]);
-            datamap.put("Group", params[2]);
+            datamap.put("MRCode", params[0]);
+            datamap.put("DeviceId", params[1]);
+            datamap.put("PASSWORD", params[2]);
             try {
-                requestUrl = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/AndroidUser", datamap);
+                requestUrl = UrlPostConnection("http://bc_service2.hescomtrm.com/Service.asmx/MRDetails", datamap);
             } catch (Exception e) {
                 e.printStackTrace();
                 /**************The below code is for checking server time out time*************/
@@ -270,40 +278,26 @@ public class ActivityLogin2 extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            String res = parseServerXML(s);
-            Log.d("debug", "Result is" + res);
-            JSONObject jsonObject;
+            String result = parseServerXML(s);
+            fcall.logStatus("MR_Login" + result);
+            JSONArray jsonArray;
             try {
-                jsonObject = new JSONObject(res);
-                String message = jsonObject.getString("message");
-                if (StringUtils.startsWithIgnoreCase(message, "Success")) {
-                    handler.sendEmptyMessage(LOGIN_SUCCESS);
-                } else {
-                    //below code is for custom toast
-                    LayoutInflater inflater = getLayoutInflater();
-                    View layout = inflater.inflate(R.layout.toast,
-                            (ViewGroup) findViewById(R.id.toast_layout));
-                    ImageView imageView = (ImageView) layout.findViewById(R.id.image);
-                    imageView.setImageResource(R.drawable.invalid);
-                    TextView textView = (TextView) layout.findViewById(R.id.text);
-                    textView.setText("Invalid Credentials!!");
-                    textView.setTextSize(20);
-                    Toast toast = new Toast(getApplicationContext());
-                    toast.setGravity(Gravity.BOTTOM, 0, 0);
-                    toast.setDuration(Toast.LENGTH_SHORT);
-                    toast.setView(layout);
-                    toast.show();
-                    //end of custom toast code
-                    if (progressDialog.isShowing())
-                        progressDialog.dismiss();
-                    showdialog(DLG_LOGIN);
-
+                jsonArray = new JSONArray(result);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String message = jsonObject.getString("message");
+                    if (StringUtils.startsWithIgnoreCase(message, "Success!")) {
+                        String login_role = jsonObject.getString("USER_ROLE");
+                        if (StringUtils.equalsIgnoreCase(login_role,"AAO")||StringUtils.equalsIgnoreCase(login_role,"AEE"))
+                        handler.sendEmptyMessage(LOGIN_SUCCESS);
+                        else handler.sendEmptyMessage(LOGIN_FAILURE);
+                    } else handler.sendEmptyMessage(LOGIN_FAILURE);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(ActivityLogin2.this, "No data found..", Toast.LENGTH_SHORT).show();
+                fcall.logStatus("JSON Exception Failure!!");
+                handler.sendEmptyMessage(LOGIN_FAILURE);
             }
-            super.onPostExecute(s);
         }
     }
 
@@ -391,13 +385,9 @@ public class ActivityLogin2 extends AppCompatActivity {
 
 
     private void initialize() {
-        role_spinner = (Spinner) findViewById(R.id.login_users_spin);
-        roles_list = new ArrayList<>();
-        roleAdapter = new RoleAdapter(roles_list, this);
-        role_spinner.setAdapter(roleAdapter);
         login_btn = (Button) findViewById(R.id.login_btn);
         fcall = new FunctionsCall();
-        //version_code = (TextView) findViewById(R.id.txt_version_code);
+        version_code = (TextView) findViewById(R.id.txt_version_code);
     }
 
     @Override
