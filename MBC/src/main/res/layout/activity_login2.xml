@@ -21,7 +21,7 @@
 
             <Button
                 android:id="@+id/login_btn"
-                android:layout_marginTop="150dp"
+                android:layout_marginTop="160dp"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
@@ -30,6 +30,18 @@
                 android:textAllCaps="false"
                 android:textColor="#212121"
                 android:textSize="@dimen/text18" />
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="147dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lin_login"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:buttonTint="#7CB342"
+                android:text="Testing Server"
+                android:textColor="@color/black" />
 
         </LinearLayout>
     <LinearLayout

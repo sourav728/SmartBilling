@@ -10,14 +10,12 @@ import android.widget.TextView;
 
 import com.transvision.mbc.R;
 
-/**
- * Created by Sourav
- */
 public class SummaryDetailsFragment extends Fragment {
 
-    TextView subdivision,totalvalidfile,totaldownload,notdownload,upload,notupload;
-    String division,valid,download,downloadnot,up,uploadnot,from_date,to_date;
+    TextView subdivision, totalvalidfile, totaldownload, notdownload, upload, notupload;
+    String division, valid, download, up, from_date, to_date;
     TextView from, to;
+
     public SummaryDetailsFragment() {
     }
 
@@ -25,11 +23,10 @@ public class SummaryDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view =  inflater.inflate(R.layout.fragment_summary_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_summary_details, container, false);
 
         Bundle bundle = getArguments();
-        if (bundle!= null)
-        {
+        if (bundle != null) {
             division = bundle.getString("subdivcode");
             download = bundle.getString("DWNRECORD");
             up = bundle.getString("UPLOADRECORD");
@@ -46,9 +43,7 @@ public class SummaryDetailsFragment extends Fragment {
         from = (TextView) view.findViewById(R.id.txt_from);
         to = (TextView) view.findViewById(R.id.txt_to);
 
-        //Converting to integer
-
-        int totalvalid= Integer.parseInt(valid);
+        int totalvalid = Integer.parseInt(valid);
         int totaldown = Integer.parseInt(download);
         int notdown = (totalvalid - totaldown);
         int uplo = Integer.parseInt(up);
@@ -60,9 +55,9 @@ public class SummaryDetailsFragment extends Fragment {
         subdivision.setText(division);
         totalvalidfile.setText(valid);
         totaldownload.setText(download);
-        notdownload.setText(notdown+"");
+        notdownload.setText(notdown + "");
         upload.setText(up);
-        notupload.setText(notuplo+"");
+        notupload.setText(notuplo + "");
         return view;
     }
 

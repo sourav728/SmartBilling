@@ -43,6 +43,7 @@ import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.other.DataParser;
 import com.transvision.mbc.values.GetSetValues;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -54,9 +55,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-/**
- * Created by Sourav
- */
+
+import static com.transvision.mbc.values.Constants.MY_API_KEY;
+
 public class Location extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -197,10 +198,7 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
         }
 
 
-        /**************It will display MR's location*************/
-
-        /*****Getting latitude and longitude from PreviousFragment*****/
-        if (!loc_lat.equals("")&&!loc_long.equals("")&&!loc_lat.equals("0.0")&&!loc_long.equals("0.0"))
+        if (!StringUtils.equalsIgnoreCase(loc_lat,"") && !StringUtils.equalsIgnoreCase(loc_long,"") && !StringUtils.equalsIgnoreCase(loc_lat,"NA") && !StringUtils.equalsIgnoreCase(loc_long,"NA") && !StringUtils.equalsIgnoreCase(loc_lat,"0") && !StringUtils.equalsIgnoreCase(loc_long,"0") && !StringUtils.equalsIgnoreCase(loc_lat,"0.0") && !StringUtils.equalsIgnoreCase(loc_long,"0.0"))
         {
             try {
                 lati = Double.parseDouble(loc_lat);
@@ -212,7 +210,10 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
                 e.printStackTrace();
             }
         }
-        else Toast.makeText(this, "MR Location till not yet updated!!", Toast.LENGTH_SHORT).show();
+        else {
+            Toast.makeText(this, "Location is not available!!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
@@ -275,7 +276,7 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters +"&key=" + MY_API_KEY;
         return url;
     }
 

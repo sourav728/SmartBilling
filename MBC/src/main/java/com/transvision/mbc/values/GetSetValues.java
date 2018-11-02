@@ -3,12 +3,38 @@ package com.transvision.mbc.values;
 import java.io.Serializable;
 
 public class GetSetValues implements Serializable {
-    private String login_role, tab_name;
-    private String mrcode,mrname,mobileno,deviceid;
-    private String counter,receiptcount,receipt_amount,date,mode,approved_flag,latitude,longitude;
-    private  String startaddress;
-    private String billed_record,download_time,billed_time,downlod_record,unbilled_record,Status;
+    private String login_role, tab_name, mbc_version;
+    private String mrcode, mrname, mobileno, deviceid;
+    private String counter, receiptcount, receipt_amount, date, mode, approved_flag, latitude, longitude;
+    private String startaddress;
+    private String billed_record, download_time, billed_time, downlod_record, unbilled_record, Status;
+    private String download_record, upload_record, infosys_record;
+
     public GetSetValues() {
+    }
+
+    public String getDownload_record() {
+        return download_record;
+    }
+
+    public void setDownload_record(String download_record) {
+        this.download_record = download_record;
+    }
+
+    public String getUpload_record() {
+        return upload_record;
+    }
+
+    public void setUpload_record(String upload_record) {
+        this.upload_record = upload_record;
+    }
+
+    public String getInfosys_record() {
+        return infosys_record;
+    }
+
+    public void setInfosys_record(String infosys_record) {
+        this.infosys_record = infosys_record;
     }
 
     public String getBilled_record() {
@@ -173,6 +199,14 @@ public class GetSetValues implements Serializable {
 
     public String getTab_name() {
         return tab_name;
+    }
+
+    public String getMbc_version() {
+        return mbc_version;
+    }
+
+    public void setMbc_version(String mbc_version) {
+        this.mbc_version = mbc_version;
     }
 
     public void setTab_name(String tab_name) {

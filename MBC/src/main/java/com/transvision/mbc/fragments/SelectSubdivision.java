@@ -3,6 +3,7 @@ package com.transvision.mbc.fragments;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,18 +12,24 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.transvision.mbc.ActivityLogin2;
 import com.transvision.mbc.Collection_Details;
+import com.transvision.mbc.MainActivity;
 import com.transvision.mbc.R;
 import com.transvision.mbc.adapters.RoleAdapter;
+import com.transvision.mbc.adapters.SpinnerAdapter;
+import com.transvision.mbc.posting.SendingData;
 import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.GetSetValues;
 
@@ -51,25 +58,46 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by Sourav
- */
+import static com.transvision.mbc.values.Constants.LOGIN_FAILURE;
+import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
+import static com.transvision.mbc.values.Constants.SUBDIV_DETAILS_FAILURE;
+import static com.transvision.mbc.values.Constants.SUBDIV_DETAILS_SUCCESS;
 
 public class SelectSubdivision extends Fragment {
-    private static final int PROGRESS_HOLD = 1;
     static Button submit;
     FragmentTransaction fragmentTransaction;
     Spinner subdivspinner;
     ArrayList<GetSetValues> role_list;
-    GetSetValues getSetValues, getSet;
-    RoleAdapter roleAdapter;
+    GetSetValues getSetValues;
+    SpinnerAdapter roleAdapter;
     String main_role = "";
-    ArrayList<GetSetValues> arrayList;
     String dum = "", dd = "", day = "", flag = "";
     ProgressDialog progressDialog;
     private BroadcastReceiver mNetworkReceiver;
     static TextView tv_check_connection;
-    static ConnectURL connectURL;
+    SendingData sendingData;
+
+    private Handler handler = null;
+
+    {
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case SUBDIV_DETAILS_SUCCESS:
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                        break;
+                    case SUBDIV_DETAILS_FAILURE:
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Failure!!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+    }
+
     public SelectSubdivision() {
 
     }
@@ -85,24 +113,22 @@ public class SelectSubdivision extends Fragment {
 
         subdivspinner = (Spinner) view.findViewById(R.id.subdiv_spin);
         role_list = new ArrayList<>();
-        roleAdapter = new RoleAdapter(role_list, getActivity());
+        roleAdapter = new SpinnerAdapter(role_list, getSetValues, getActivity());
         subdivspinner.setAdapter(roleAdapter);
-        arrayList = new ArrayList<>();
 
-        connectURL = new ConnectURL();
-        connectURL.execute();
+        sendingData = new SendingData(getContext());
 
-        /*for (int i = 0; i < getResources().getStringArray(R.array.subdivision).length; i++) {
-            getSet = new GetSetValues();
-            getSet.setLogin_role(getResources().getStringArray(R.array.subdivision)[i]);
-            role_list.add(getSet);
-            roleAdapter.notifyDataSetChanged();
-        }*/
+        progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
+        progressDialog.setTitle("Checking Credentials");
+        progressDialog.setMessage("Please Wait..");
+        progressDialog.show();
 
-         subdivspinner.setSelection(0);
+        SendingData.SendSubdivCodeRequest sendSubdivCodeRequest = sendingData.new SendSubdivCodeRequest(handler, role_list, getSetValues, roleAdapter);
+        sendSubdivCodeRequest.execute();
+
+        subdivspinner.setSelection(0);
 
         if (bundle != null) {
-            //subdivisioncode = bundle.getString("subdivcode");
             dum = bundle.getString("date");
             dd = bundle.getString("dd");
             day = bundle.getString("daycount");
@@ -117,35 +143,35 @@ public class SelectSubdivision extends Fragment {
                 main_role = role;
                 if (main_role.equals("540001 - CITY SUB-DIVISION-3 HUBLI")) {
                     main_role = "540001";
-                }else if (main_role.equals("540002 - CITY SUB-DIVISION-2 HUBLI")){
+                } else if (main_role.equals("540002 - CITY SUB-DIVISION-2 HUBLI")) {
                     main_role = "540002";
-                }else if (main_role.equals("540004 - CITY SUB-DIVISION-1 HUBLI")){
+                } else if (main_role.equals("540004 - CITY SUB-DIVISION-1 HUBLI")) {
                     main_role = "540004";
-                }else if (main_role.equals("540006 - CITY SUB-DIVISION-1 DHARWAD")){
+                } else if (main_role.equals("540006 - CITY SUB-DIVISION-1 DHARWAD")) {
                     main_role = "540006";
-                }else if (main_role.equals("540008 - CITY SUB-DIVISION-2 DHARWAD")){
+                } else if (main_role.equals("540008 - CITY SUB-DIVISION-2 DHARWAD")) {
                     main_role = "540008";
-                }else if (main_role.equals("540011 - CITY SUB-DIVISION GADAG")){
+                } else if (main_role.equals("540011 - CITY SUB-DIVISION GADAG")) {
                     main_role = "540011";
-                }else if (main_role.equals("540014 - LAKSHMESHVAR SUB-DIVISION")){
+                } else if (main_role.equals("540014 - LAKSHMESHVAR SUB-DIVISION")) {
                     main_role = "540014";
-                }else if (main_role.equals("540015 - NARGUND SUB-DIVISION")){
+                } else if (main_role.equals("540015 - NARGUND SUB-DIVISION")) {
                     main_role = "540015";
-                }else if (main_role.equals("540018 - HAVERI SUB-DIVISION")){
+                } else if (main_role.equals("540018 - HAVERI SUB-DIVISION")) {
                     main_role = "540018";
-                }else if (main_role.equals("540020 - SAVANUR SUB-DIVISION")){
+                } else if (main_role.equals("540020 - SAVANUR SUB-DIVISION")) {
                     main_role = "540020";
-                }else if (main_role.equals("540022 - RANEBENNUR-1 SUB-DIVISION")){
+                } else if (main_role.equals("540022 - RANEBENNUR-1 SUB-DIVISION")) {
                     main_role = "540022";
-                }else if (main_role.equals("540026 - SIRSI SUB-DIVISION")){
+                } else if (main_role.equals("540026 - SIRSI SUB-DIVISION")) {
                     main_role = "540026";
-                }else if (main_role.equals("540030 - DANDELI SUB-DIVISION")){
+                } else if (main_role.equals("540030 - DANDELI SUB-DIVISION")) {
                     main_role = "540030";
-                }else if (main_role.equals("540032 - KARWAR SUB-DIVISION")){
+                } else if (main_role.equals("540032 - KARWAR SUB-DIVISION")) {
                     main_role = "540032";
-                }else if (main_role.equals("540034 - KUMTA SUB-DIVISION")){
+                } else if (main_role.equals("540034 - KUMTA SUB-DIVISION")) {
                     main_role = "540034";
-                }else if (main_role.equals("540036 - BHATKAL SUB-DIVISION")){
+                } else if (main_role.equals("540036 - BHATKAL SUB-DIVISION")) {
                     main_role = "540036";
                 } else if (main_role.equals("540037 - CITY SUB-DIVISION-1 BELGAUM")) {
                     main_role = "540037";
@@ -153,37 +179,37 @@ public class SelectSubdivision extends Fragment {
                     main_role = "540038";
                 } else if (main_role.equals("540039 - CITY SUB-DIVISION-3 BELGAUM")) {
                     main_role = "540039";
-                } else if (main_role.equals("540042 - BAILHONGAL SUB-DIVISION")){
+                } else if (main_role.equals("540042 - BAILHONGAL SUB-DIVISION")) {
                     main_role = "540042";
-                } else if (main_role.equals("540043 - SAUNDATTI SUB-DIVISION")){
+                } else if (main_role.equals("540043 - SAUNDATTI SUB-DIVISION")) {
                     main_role = "540043";
-                } else if (main_role.equals("540044 - RAMDURG SUB-DIVISION")){
+                } else if (main_role.equals("540044 - RAMDURG SUB-DIVISION")) {
                     main_role = "540044";
-                } else if (main_role.equals("540046 - GOKAK SUB-DIVISION")){
+                } else if (main_role.equals("540046 - GOKAK SUB-DIVISION")) {
                     main_role = "540046";
-                } else if (main_role.equals("540047 - CHIKODI SUB-DIVISION")){
+                } else if (main_role.equals("540047 - CHIKODI SUB-DIVISION")) {
                     main_role = "540047";
-                } else if (main_role.equals("540048 - NIPPANI SUB-DIVISION")){
+                } else if (main_role.equals("540048 - NIPPANI SUB-DIVISION")) {
                     main_role = "540048";
-                } else if (main_role.equals("540050 - ATHANI SUB-DIVISION")){
+                } else if (main_role.equals("540050 - ATHANI SUB-DIVISION")) {
                     main_role = "540050";
-                } else if (main_role.equals("540055 - CITY SUB-DIVISION-1 BIJAPUR")){
+                } else if (main_role.equals("540055 - CITY SUB-DIVISION-1 BIJAPUR")) {
                     main_role = "540055";
-                } else if (main_role.equals("540056 - CITY SUB-DIVISION-2 BIJAPUR")){
+                } else if (main_role.equals("540056 - CITY SUB-DIVISION-2 BIJAPUR")) {
                     main_role = "540056";
-                } else if (main_role.equals("540061 - INDI SUB-DIVISION")){
+                } else if (main_role.equals("540061 - INDI SUB-DIVISION")) {
                     main_role = "540061";
-                } else if (main_role.equals("540065 - CITY SUB-DIVISION BAGALKOT")){
+                } else if (main_role.equals("540065 - CITY SUB-DIVISION BAGALKOT")) {
                     main_role = "540065";
-                } else if (main_role.equals("540067 - GULEDAGUDDA SUB-DIVISION")){
+                } else if (main_role.equals("540067 - GULEDAGUDDA SUB-DIVISION")) {
                     main_role = "540067";
-                } else if (main_role.equals("540068 - ILKAL SUB-DIVISION")){
+                } else if (main_role.equals("540068 - ILKAL SUB-DIVISION")) {
                     main_role = "540068";
-                } else if (main_role.equals("540069 - JAMKHANDI SUB-DIVISION")){
+                } else if (main_role.equals("540069 - JAMKHANDI SUB-DIVISION")) {
                     main_role = "540069";
-                } else if (main_role.equals("540070 - RABKAVI SUB-DIVISION")){
+                } else if (main_role.equals("540070 - RABKAVI SUB-DIVISION")) {
                     main_role = "540070";
-                } else if (main_role.equals("540071 - MAHALINGPUR SUB-DIVISION")){
+                } else if (main_role.equals("540071 - MAHALINGPUR SUB-DIVISION")) {
                     main_role = "540071";
                 } else if (main_role.equals("540072 - MUDHOL SUB-DIVISION")) {
                     main_role = "540072";
@@ -240,8 +266,8 @@ public class SelectSubdivision extends Fragment {
         return view;
     }
 
-    public static void dialog1(boolean value){
-        if(value){
+    public static void dialog1(boolean value) {
+        if (value) {
             tv_check_connection.setText("Back Online");
             tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
             tv_check_connection.setTextColor(Color.WHITE);
@@ -254,7 +280,7 @@ public class SelectSubdivision extends Fragment {
             };
             handler.postDelayed(delayrunnable, 3000);
             submit.setEnabled(true);
-        }else {
+        } else {
             tv_check_connection.setVisibility(View.VISIBLE);
             tv_check_connection.setText("No Internet Connection!!");
             tv_check_connection.setBackgroundColor(Color.RED);
@@ -262,130 +288,5 @@ public class SelectSubdivision extends Fragment {
             submit.setEnabled(false);
         }
     }
-
-    public class ConnectURL extends AsyncTask<String, String, String> {
-        String response = "";
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(),"Loading","Loading Please wait..",true);
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/Subdivision_Details");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return response;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            String res = parseServerXML(s);
-            JSONArray jsonArray;
-            try {
-                jsonArray = new JSONArray(res);
-                if (jsonArray.length() > 0) {
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        getSet = new GetSetValues();
-                        String subdivisionname = jsonObject.getString("subdivisionname");
-                        getSet.setLogin_role(subdivisionname);
-                        role_list.add(getSet);
-                        roleAdapter.notifyDataSetChanged();
-                        if (progressDialog.isShowing())
-                            progressDialog.dismiss();
-                    }
-                }
-            } catch (JSONException e) {
-                Toast.makeText(getActivity(), "No Value Found!!", Toast.LENGTH_SHORT).show();
-                if (progressDialog.isShowing())
-                    progressDialog.dismiss();
-            }
-            super.onPostExecute(s);
-        }
-    }
-
-    private String UrlPostConnection(String Post_Url) throws IOException {
-        String response = "";
-        URL url = new URL(Post_Url);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(15000);
-        conn.setConnectTimeout(15000);
-        conn.setRequestMethod("POST");
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        OutputStream outputStream = conn.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-        outputStream.close();
-        int responseCode = conn.getResponseCode();
-        if (responseCode == HttpsURLConnection.HTTP_OK) {
-            String line;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            while ((line = bufferedReader.readLine()) != null) {
-                response += line;
-            }
-        } else {
-            response = "";
-        }
-        return response;
-    }
-
-    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-            Log.d("debug", result.toString());
-        }
-        return result.toString();
-    }
-
-    public String parseServerXML(String result) {
-        String value = "";
-        XmlPullParserFactory pullParserFactory;
-        InputStream res;
-        try {
-            res = new ByteArrayInputStream(result.getBytes());
-            pullParserFactory = XmlPullParserFactory.newInstance();
-            pullParserFactory.setNamespaceAware(true);
-            XmlPullParser parser = pullParserFactory.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(res, null);
-            int eventType = parser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                String name = parser.getName();
-                switch (eventType) {
-                    case XmlPullParser.START_DOCUMENT:
-                        break;
-                    case XmlPullParser.START_TAG:
-                        switch (name) {
-                            case "string":
-                                value = parser.nextText();
-                                break;
-                        }
-                        break;
-                    case XmlPullParser.END_TAG:
-                        break;
-                }
-                eventType = parser.next();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
-
 
 }

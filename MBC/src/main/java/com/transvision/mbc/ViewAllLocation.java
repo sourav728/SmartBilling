@@ -54,6 +54,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.transvision.mbc.values.Constants.MY_API_KEY;
+
 /**
  * Created by Sourav
  */
@@ -287,7 +290,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&key=" + MY_API_KEY;
         return url;
     }
 

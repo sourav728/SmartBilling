@@ -466,7 +466,7 @@ public class ShowMrDetails extends Fragment {
                 if (StringUtils.startsWithIgnoreCase(message, "Failed")) {
 
                     /**************Custom Toast***************/
-                    Toast toast = Toast.makeText(getActivity(), "Holiday so no Billings....", Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getActivity(), "No Billings....", Toast.LENGTH_LONG);
                     View view = toast.getView();
 
                     //To change the Background of Toast

@@ -11,9 +11,7 @@ import com.transvision.mbc.R;
 import com.transvision.mbc.values.GetSetValues;
 
 import java.util.ArrayList;
-/**
- * Created by Sourav
- */
+
 public class RoleAdapter extends BaseAdapter {
     private ArrayList<GetSetValues> arrayList = new ArrayList<>();
     private Context context;

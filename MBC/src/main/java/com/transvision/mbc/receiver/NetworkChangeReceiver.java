@@ -10,10 +10,6 @@ import android.util.Log;
 import static com.transvision.mbc.fragments.SelectSubdivision.dialog1;
 import static com.transvision.mbc.fragments.SendSubdivCode.dialog;
 
-/**
- * Created by TVD on 4/13/2018.
- */
-
 public class NetworkChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

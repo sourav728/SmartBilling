@@ -24,5 +24,8 @@
         <item name="colorAccent">@color/green</item> <!-- Whatever color you want-->
     </style>
 
+    <style name="MyProgressDialogstyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+    </style>
 
 </resources>

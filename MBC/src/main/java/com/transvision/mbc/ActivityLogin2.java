@@ -1,10 +1,14 @@
 package com.transvision.mbc;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -26,6 +30,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +41,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.adapters.RoleAdapter;
+import com.transvision.mbc.ftp.FTPAPI;
+import com.transvision.mbc.other.Apk_Notification;
+import com.transvision.mbc.posting.SendingData;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
@@ -50,6 +59,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,29 +75,34 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by Sourav
- */
+import static com.transvision.mbc.values.Constants.APK_FILE_DOWNLOADED;
+import static com.transvision.mbc.values.Constants.APK_FILE_NOT_FOUND;
+import static com.transvision.mbc.values.Constants.DLG_APK_NOT_FOUND;
+import static com.transvision.mbc.values.Constants.DLG_APK_UPDATE_FAILURE;
+import static com.transvision.mbc.values.Constants.DLG_APK_UPDATE_SUCCESS;
+import static com.transvision.mbc.values.Constants.DLG_LOGIN;
+import static com.transvision.mbc.values.Constants.LOGIN_FAILURE;
+import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
+import static com.transvision.mbc.values.Constants.PASSWORD;
+import static com.transvision.mbc.values.Constants.PREF_NAME;
+import static com.transvision.mbc.values.Constants.USERNAME;
+
 public class ActivityLogin2 extends AppCompatActivity {
-    private static final int DLG_LOGIN = 4;
-    private static final int SUB_DIV_LOGIN_SUCCESS = 1;
-    private static final int SUB_DIV_LOGIN_FAILURE = 2;
-    private static final int SERVER_TIME_OUT = 3;
-    private static final int LOGIN_SUCCESS = 4;
-    private static final int LOGIN_FAILURE = 5;
-    Spinner role_spinner;
-    ProgressDialog progressDialog;
+
     String code, password;
-    ArrayList<GetSetValues> roles_list;
-    RoleAdapter roleAdapter;
     GetSetValues getSetValues;
     FunctionsCall fcall;
     Button login_btn;
-    String main_role = "";
-    String requestUrl = "";
-    String group = "", current_version = "", DeviceID="";
+    SharedPreferences Mbc;
+    SharedPreferences.Editor editor;
+    String group = "", current_version = "", DeviceID = "";
     TextView version_code;
-    static ProgressDialog progressdialog;
+    ProgressDialog progressdialog;
+    SendingData sendingData;
+    AlertDialog login_dialog;
+    CheckBox test_server;
+    FTPAPI ftpapi;
+    ProgressDialog mProgressDialog = null;
     private Handler handler = null;
 
     {
@@ -96,10 +111,10 @@ public class ActivityLogin2 extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case LOGIN_SUCCESS:
-                        progressDialog.dismiss();
-                        Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
-                        intent.putExtra("subdivcode", code);
-                        startActivity(intent);
+                        SavePreferences("Username",code);
+                        SavePreferences("Password",password);
+                        progressdialog.dismiss();
+                        login_dialog.dismiss();
                         //Below code is for custom toast message
                         LayoutInflater inflater = getLayoutInflater();
                         View layout = inflater.inflate(R.layout.toast,
@@ -114,12 +129,26 @@ public class ActivityLogin2 extends AppCompatActivity {
                         toast.setDuration(Toast.LENGTH_SHORT);
                         toast.setView(layout);
                         toast.show();
-                        //end of custom toast coding
-                        finish();
+                        start_version_check();
+                        if (fcall.compare(current_version, getSetValues.getMbc_version()))
+                            showdialog(DLG_APK_UPDATE_SUCCESS);
+                        else showdialog(DLG_APK_UPDATE_FAILURE);
+                        //finish();
                         break;
                     case LOGIN_FAILURE:
+                        login_dialog.dismiss();
                         Toast.makeText(ActivityLogin2.this, "Invalid Credentials!!", Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
+                        progressdialog.dismiss();
+                        break;
+
+                    case APK_FILE_DOWNLOADED:
+                        mProgressDialog.dismiss();
+                        fcall.updateApp(ActivityLogin2.this, new File(fcall.filepath("ApkFolder") +
+                                File.separator + "MBC_" + getSetValues.getMbc_version() + ".apk"));
+                        break;
+                    case APK_FILE_NOT_FOUND:
+                        mProgressDialog.dismiss();
+                        showDialog(DLG_APK_NOT_FOUND);
                         break;
                 }
                 super.handleMessage(msg);
@@ -146,6 +175,18 @@ public class ActivityLogin2 extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (test_server.isChecked()) {
+                    SavePreferences("TEST_REAL_SERVER", "TEST");
+                    sendingData = new SendingData(ActivityLogin2.this);
+                } else {
+                    SavePreferences("TEST_REAL_SERVER", "REAL");
+                    sendingData = new SendingData(ActivityLogin2.this);
+                }
+            }
+        });
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,46 +202,24 @@ public class ActivityLogin2 extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                    //MR Login
-                    //User ID 54003799
-                    //String DeviceID ="354016070557564";
-                    //Password = "12345"
-
-                    //AAO Login
-                    //UserName = 10540038
-                    //DeviceID = "866133033048564";
-                    //Password = "AAO@123"
-
-                    //AEE Login
-                    //UserName =11540037
-                    //Password = CSD1AEE@123
-                    // DeviceID = "866133032881726";
-                    //DeviceID = telephonyManager.getDeviceId();
-                    Log.d("Debug", "Device ID" + DeviceID);
-
+                Log.d("Debug", "Device ID" + DeviceID);
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
-                        showdialog(DLG_LOGIN);
+                    showdialog(DLG_LOGIN);
                 } else {
                     Toast.makeText(ActivityLogin2.this, "Please connect to internet..", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
     }
 
     public void showdialog(int id) {
+        Dialog dialog;
         LinearLayout linearLayout = (LinearLayout) this.getLayoutInflater().inflate(R.layout.subdiv_login_screen, null);
         final EditText et_login_id = (EditText) linearLayout.findViewById(R.id.et_admin_id);
         final EditText et_pass = (EditText) linearLayout.findViewById(R.id.et_admin_password);
         switch (id) {
-            case SUB_DIV_LOGIN_SUCCESS:
-                progressDialog = ProgressDialog.show(this, "Fetching details..", "Wait..", true);
-                break;
-            case SUB_DIV_LOGIN_FAILURE:
-                progressDialog = progressDialog.show(this, "Fetching details..", "wait", true);
-                break;
-            case SERVER_TIME_OUT:
-                Toast.makeText(this, "Server Time out..", Toast.LENGTH_SHORT).show();
-                break;
+
             case DLG_LOGIN:
                 AlertDialog.Builder login_dlg = new AlertDialog.Builder(this);
                 login_dlg.setTitle(getResources().getString(R.string.dialog_login));
@@ -212,7 +231,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                 final Button login_btn = (Button) dlg_linear.findViewById(R.id.dialog_positive_btn);
                 final Button cancel_btn = (Button) dlg_linear.findViewById(R.id.dialog_negative_btn);
 
-                final AlertDialog login_dialog = login_dlg.create();
+                login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
@@ -220,18 +239,26 @@ public class ActivityLogin2 extends AppCompatActivity {
                         login_btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 code = et_loginid.getText().toString();
-                                if (!TextUtils.isEmpty(code)) {
-                                    password = et_password.getText().toString();
-                                    if (!TextUtils.isEmpty(password)) {
-                                        progressDialog = ProgressDialog.show(ActivityLogin2.this, "Login", "Login Please Wait..");
-                                        login_dialog.dismiss();
-                                        ConnectURL connectURL = new ConnectURL();
-                                        connectURL.execute(code, DeviceID, password);
+                                if (fcall.isInternetOn(ActivityLogin2.this)) {
+                                    if (!TextUtils.isEmpty(code)) {
+                                        password = et_password.getText().toString();
+                                        if (!TextUtils.isEmpty(password)) {
+
+                                            progressdialog = new ProgressDialog(ActivityLogin2.this, R.style.MyProgressDialogstyle);
+                                            progressdialog.setTitle("Checking Credentials");
+                                            progressdialog.setMessage("Please Wait..");
+                                            progressdialog.show();
+
+                                            SendingData.Login login = sendingData.new Login(getSetValues, handler);
+                                            login.execute(code, password);
+                                        } else
+                                            et_password.setError(getResources().getString(R.string.dialog_login_password_error));
                                     } else
-                                        et_password.setError(getResources().getString(R.string.dialog_login_password_error));
+                                        et_loginid.setError(getResources().getString(R.string.dialog_login_id_error));
                                 } else
-                                    et_loginid.setError(getResources().getString(R.string.dialog_login_id_error));
+                                    Toast.makeText(ActivityLogin2.this, "Please Connect to Internet!!", Toast.LENGTH_SHORT).show();
                             }
                         });
                         cancel_btn.setOnClickListener(new View.OnClickListener() {
@@ -246,156 +273,95 @@ public class ActivityLogin2 extends AppCompatActivity {
                 ((AlertDialog) login_dialog).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.MAGENTA);
                 ((AlertDialog) login_dialog).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
                 break;
+
+            case DLG_APK_UPDATE_SUCCESS:
+                android.app.AlertDialog.Builder appupdate = new android.app.AlertDialog.Builder(this);
+                appupdate.setTitle("App Updates");
+                appupdate.setCancelable(false);
+                appupdate.setMessage("Your current version number : " + current_version +
+                        "\n" + "\n" +
+                        "New version is available : " + getSetValues.getMbc_version() + "\n");
+                appupdate.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mProgressDialog = new ProgressDialog(ActivityLogin2.this);
+                        mProgressDialog.setMessage("Downloading file..");
+                        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                        mProgressDialog.setCancelable(false);
+                        mProgressDialog.show();
+                        FTPAPI.Download_apk downloadApk = ftpapi.new Download_apk(handler, mProgressDialog, getSetValues.getMbc_version());
+                        downloadApk.execute();
+                    }
+                });
+                appupdate.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        move_to_next_activity();
+                    }
+                });
+                dialog = appupdate.create();
+                dialog.show();
+                break;
+            case DLG_APK_UPDATE_FAILURE:
+                move_to_next_activity();
+                break;
+            case DLG_APK_NOT_FOUND:
+                android.app.AlertDialog.Builder apknotfound = new android.app.AlertDialog.Builder(this);
+                apknotfound.setTitle("App Update");
+                apknotfound.setCancelable(false);
+                apknotfound.setMessage("Apk not found to download from server..");
+                apknotfound.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                dialog = apknotfound.create();
+                dialog.show();
+                break;
         }
     }
 
-    public class ConnectURL extends AsyncTask<String, String, String> {
-        HashMap<String, String> datamap = new HashMap<>();
-
-        @Override
-        protected String doInBackground(String... params) {
-            HashMap<String, String> datamap = new HashMap<>();
-
-            datamap.put("MRCode", params[0]);
-            datamap.put("DeviceId", params[1]);
-            datamap.put("PASSWORD", params[2]);
-            try {
-                requestUrl = UrlPostConnection("http://bc_service2.hescomtrm.com/Service.asmx/MRDetails", datamap);
-            } catch (Exception e) {
-                e.printStackTrace();
-                /**************The below code is for checking server time out time*************/
-               // showdialog(SERVER_TIME_OUT);
-                if (progressDialog.isShowing())
-                    progressDialog.dismiss();
-            }
-            return requestUrl;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            String result = parseServerXML(s);
-            fcall.logStatus("MR_Login" + result);
-            JSONArray jsonArray;
-            try {
-                jsonArray = new JSONArray(result);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    String message = jsonObject.getString("message");
-                    if (StringUtils.startsWithIgnoreCase(message, "Success!")) {
-                        String login_role = jsonObject.getString("USER_ROLE");
-                        if (StringUtils.equalsIgnoreCase(login_role,"AAO")||StringUtils.equalsIgnoreCase(login_role,"AEE"))
-                        handler.sendEmptyMessage(LOGIN_SUCCESS);
-                        else handler.sendEmptyMessage(LOGIN_FAILURE);
-                    } else handler.sendEmptyMessage(LOGIN_FAILURE);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                fcall.logStatus("JSON Exception Failure!!");
-                handler.sendEmptyMessage(LOGIN_FAILURE);
-            }
-        }
+    private void move_to_next_activity()
+    {
+        Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
+        intent.putExtra("subdivcode", code);
+        startActivity(intent);
+        finish();
     }
-
-    private String UrlPostConnection(String Post_Url, HashMap<String, String> datamap) throws IOException {
-        String response = "";
-        URL url = new URL(Post_Url);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(15000);
-        conn.setConnectTimeout(15000);
-        conn.setRequestMethod("POST");
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        OutputStream outputStream = conn.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-        writer.write(getPostDataString(datamap));
-        writer.flush();
-        writer.close();
-        outputStream.close();
-        int responseCode = conn.getResponseCode();
-        if (responseCode == HttpsURLConnection.HTTP_OK) {
-            String line;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            while ((line = bufferedReader.readLine()) != null) {
-                response += line;
-            }
-        } else {
-            response = "";
-        }
-
-        return response;
-    }
-
-    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-            Log.d("debug", result.toString());
-        }
-        return result.toString();
-    }
-
-    public String parseServerXML(String result) {
-        String value = "";
-        XmlPullParserFactory pullParserFactory;
-        InputStream res;
-        try {
-            res = new ByteArrayInputStream(result.getBytes());
-            pullParserFactory = XmlPullParserFactory.newInstance();
-            pullParserFactory.setNamespaceAware(true);
-            XmlPullParser parser = pullParserFactory.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(res, null);
-            int eventType = parser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                String name = parser.getName();
-                switch (eventType) {
-                    case XmlPullParser.START_DOCUMENT:
-                        break;
-                    case XmlPullParser.START_TAG:
-                        switch (name) {
-                            case "string":
-                                value = parser.nextText();
-                                break;
-                        }
-                        break;
-                    case XmlPullParser.END_TAG:
-                        break;
-                }
-                eventType = parser.next();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
-
-
     private void initialize() {
+        ftpapi = new FTPAPI();
         login_btn = (Button) findViewById(R.id.login_btn);
         fcall = new FunctionsCall();
         version_code = (TextView) findViewById(R.id.txt_version_code);
+        sendingData = new SendingData(this);
+        test_server = (CheckBox) findViewById(R.id.checkbox);
+        getSetValues = new GetSetValues();
+        Mbc = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        editor = Mbc.edit();
+        editor.apply();
     }
 
-    @Override
-    protected void onDestroy() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-        super.onDestroy();
+    private void SavePreferences(String key, String value) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, value);
+        editor.commit();
     }
+    private void start_version_check() {
+        fcall.logStatus("Version_receiver Checking..");
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), Apk_Notification.class);
+        boolean alarmRunning = (PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_NO_CREATE) != null);
+        if (!alarmRunning) {
+            fcall.logStatus("Version_receiver Started..");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (10000), pendingIntent);
+        } else fcall.logStatus("Version_receiver Already running..");
+    }
+
+   /* @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mProgressDialog.dismiss();
+    }*/
 }

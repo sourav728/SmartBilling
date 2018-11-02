@@ -2,8 +2,11 @@ package com.transvision.mbc.fragments;
 
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -18,7 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.R;
+import com.transvision.mbc.posting.SendingData;
 import com.transvision.mbc.values.FunctionsCall;
+import com.transvision.mbc.values.GetSetValues;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -44,18 +49,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
-/**
- * Created by Sourav
- */
+
+import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_FAILURE;
+import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_SUCCESS;
+
 public class SummaryFragment extends Fragment {
     Button report;
-
-   /* Spinner subdivspinner;
-    ArrayList<GetSetValues> role_list;
-    GetSetValues getSetValues, getSet;
-    RoleAdapter roleAdapter;
-    String main_role = "";
-    ArrayList<GetSetValues> arrayList;*/
 
     TextView fromdate, todate;
     ImageView imagefrom, imageto;
@@ -63,9 +62,46 @@ public class SummaryFragment extends Fragment {
     private Calendar mcalender;
     int daycount;
     String dd, date1, date2, subdivisioncode;
-    String DWNRECORD,UPLOADRECORD,INFOSYSRECORD;
+    String DWNRECORD, UPLOADRECORD, INFOSYSRECORD;
     FunctionsCall functioncall;
     FragmentTransaction fragmenttransaction;
+    SendingData sendingData;
+    GetSetValues getSetValues;
+    ProgressDialog progressDialog;
+    private static Handler handler = null;
+
+    {
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case BILLING_FILE_SUMMARY_SUCCESS:
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Success..", Toast.LENGTH_SHORT).show();
+                        SummaryDetailsFragment summarydetailsfragment = new SummaryDetailsFragment();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("subdivcode", subdivisioncode);
+                        bundle.putString("DWNRECORD", getSetValues.getDownload_record());
+                        bundle.putString("UPLOADRECORD", getSetValues.getUpload_record());
+                        bundle.putString("INFOSYSRECORD", getSetValues.getInfosys_record());
+                        bundle.putString("FROM", date1);
+                        bundle.putString("TO", date2);
+                        summarydetailsfragment.setArguments(bundle);
+
+                        fragmenttransaction = getFragmentManager().beginTransaction();
+                        fragmenttransaction.replace(R.id.container_main, summarydetailsfragment).addToBackStack(null).commit();
+                        break;
+                    case BILLING_FILE_SUMMARY_FAILURE:
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Data Not Found..", Toast.LENGTH_SHORT).show();
+                        break;
+
+                }
+            }
+        };
+    }
+
     public SummaryFragment() {
     }
 
@@ -73,28 +109,13 @@ public class SummaryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_summary, container, false);
-
+        sendingData = new SendingData(getContext());
         fromdate = (TextView) view.findViewById(R.id.txt_fromdate);
         todate = (TextView) view.findViewById(R.id.txt_todate);
         imagefrom = (ImageView) view.findViewById(R.id.img_fromdate);
         imageto = (ImageView) view.findViewById(R.id.img_todate);
         report = (Button) view.findViewById(R.id.btn_report);
-
-       /* subdivspinner = (Spinner) view.findViewById(R.id.subdiv_spin);
-        role_list = new ArrayList<>();
-        roleAdapter = new RoleAdapter(role_list, getActivity());
-        subdivspinner.setAdapter(roleAdapter);
-        arrayList = new ArrayList<>();
-
-
-        for (int i = 0; i < getResources().getStringArray(R.array.subdivision).length; i++) {
-            getSet = new GetSetValues();
-            getSet.setLogin_role(getResources().getStringArray(R.array.subdivision)[i]);
-            role_list.add(getSet);
-            roleAdapter.notifyDataSetChanged();
-        }
-
-        subdivspinner.setSelection(0);*/
+        getSetValues = new GetSetValues();
 
         mcalender = Calendar.getInstance();
         day = mcalender.get(Calendar.DAY_OF_MONTH);
@@ -103,8 +124,7 @@ public class SummaryFragment extends Fragment {
         month = mcalender.get(Calendar.MONTH);
         functioncall = new FunctionsCall();
         Bundle bundle = getArguments();
-        if (bundle !=null)
-        {
+        if (bundle != null) {
             subdivisioncode = bundle.getString("subdivcode");
         }
 
@@ -123,67 +143,26 @@ public class SummaryFragment extends Fragment {
             }
         });
 
-       /* subdivspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TextView tvrole = (TextView) view.findViewById(R.id.spinner_txt);
-                String role = tvrole.getText().toString();
-
-                if (!tvrole.equals("--SELECT--")) {
-                    main_role = role;
-                    if (main_role.equals("CSD1")) {
-                        main_role = "540037";
-                        Toast.makeText(getActivity(), "CSD1 selected.." + main_role, Toast.LENGTH_SHORT).show();
-
-                    } else if (main_role.equals("CSD2")) {
-                        main_role = "540038";
-                        Toast.makeText(getActivity(), "CSD2 selected.." + main_role, Toast.LENGTH_SHORT).show();
-                    } else if (main_role.equals("CSD3")) {
-                        main_role = "540039";
-                        Toast.makeText(getActivity(), "CSD3 selected.." + main_role, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getActivity(), "Nothing selected..", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Please Select Subdivision!!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });*/
 
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              /*  if (fromdate.getText().toString().equals("") || todate.getText().toString().equals(""))
-                {
-                    if (fromdate.getText().toString().equals(""))
-                    {
-                        Toast.makeText(getActivity(), "Please Select from date!!", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
-                        Toast.makeText(getActivity(), "Please Select to date!!", Toast.LENGTH_SHORT).show();
-                    }
 
-                }
-                else
-                {
-                    ConnectURL connecturl = new ConnectURL();
-                    connecturl.execute();
-                }*/
-              if(!fromdate.getText().toString().equals(""))
-              {
-                  if (!todate.getText().toString().equals(""))
-                  {
-                      ConnectURL connecturl = new ConnectURL();
-                      connecturl.execute();
+                if (!fromdate.getText().toString().equals("")) {
+                    if (!todate.getText().toString().equals("")) {
 
-                  }else Toast.makeText(getActivity(), "Please Select To date!!", Toast.LENGTH_SHORT).show();
-              }else Toast.makeText(getActivity(), "Please select from date!!", Toast.LENGTH_SHORT).show();
+                        progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
+                        progressDialog.setTitle("Fetching Details");
+                        progressDialog.setMessage("Please Wait..");
+                        progressDialog.show();
+
+                        SendingData.BillingFileSummary billingFileSummary = sendingData.new BillingFileSummary(handler, getSetValues);
+                        billingFileSummary.execute(subdivisioncode, functioncall.Parse_Date5(date1), functioncall.Parse_Date5(date2));
+
+                    } else
+                        Toast.makeText(getActivity(), "Please Select To date!!", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getActivity(), "Please select from date!!", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -196,7 +175,7 @@ public class SummaryFragment extends Fragment {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-" + dayOfMonth);
                 date1 = functioncall.Parse_Date4(dd);
                 fromdate.setText(date1);
             }
@@ -210,7 +189,7 @@ public class SummaryFragment extends Fragment {
         DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dd = (year + "-" + (month + 1) + "-"  + dayOfMonth);
+                dd = (year + "-" + (month + 1) + "-" + dayOfMonth);
                 date2 = functioncall.Parse_Date4(dd);
                 todate.setText(date2);
             }
@@ -220,7 +199,7 @@ public class SummaryFragment extends Fragment {
         dpdialog.show();
     }
 
-    public class ConnectURL extends AsyncTask<String, String, String>
+   /* public class ConnectURL extends AsyncTask<String, String, String>
     {
         String response = "";
 
@@ -304,7 +283,7 @@ public class SummaryFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
     private String UrlPostConnection(String Post_Url, HashMap<String, String> datamap) throws IOException {
         String response = "";

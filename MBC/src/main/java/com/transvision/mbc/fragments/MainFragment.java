@@ -15,9 +15,7 @@ import com.transvision.mbc.MainActivity;
 import com.transvision.mbc.R;
 
 import java.util.ArrayList;
-/**
- * Created by Sourav
- */
+
 public class MainFragment extends Fragment {
     View view;
     SectionsPagerAdapter mSectionsPagerAdapter;

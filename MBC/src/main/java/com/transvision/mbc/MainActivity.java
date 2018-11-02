@@ -1,6 +1,10 @@
 package com.transvision.mbc;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -16,20 +20,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.transvision.mbc.fragments.MainFragment;
 import com.transvision.mbc.fragments.SendSubdivCode;
+import com.transvision.mbc.other.Apk_Notification;
+import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
 import java.util.ArrayList;
-/**
- * Created by Sourav
- */
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     GetSetValues getSetValues;
@@ -37,10 +35,9 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ArrayList<String> main_tabs_list;
     String subdiv;
-    String current_version="";
+    String current_version = "";
+    FunctionsCall fcall;
     public enum Steps {
-        //FORM0(MainFragment.class),
-        //FORM1(Billing_Contents.class),
         FORM2(SendSubdivCode.class);
 
         private Class clazz;
@@ -58,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        fcall = new FunctionsCall();
         PackageInfo packageInfo;
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -68,7 +65,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         Intent intent = getIntent();
-        //getSetValues = (GetSetValues) intent.getSerializableExtra(GETSET);
         getSetValues = new GetSetValues();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -95,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem nav_version = menu.findItem(R.id.nav_versioncode);
         //below line is for disableing the nav_versioncode click
         nav_version.setEnabled(false);
-        nav_version.setTitle("Version: "+current_version);
+        nav_version.setTitle("Version: " + current_version);
         logout_navigationView.setItemTextColor(ColorStateList.valueOf(Color.parseColor("#039BE5")));
         switchContent(Steps.FORM2, getResources().getString(R.string.app_name));
 
@@ -161,7 +157,6 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_main:
@@ -170,6 +165,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_logout:
                 Intent intent = new Intent(MainActivity.this, ActivityLogin2.class);
                 startActivity(intent);
+                SharedPreferences sharedPreferences = getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
                 finish();
                 break;
         }
