@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 def versionMajor = 1
-def versionMinor = 1
-def versionPatch = 6
+def versionMinor = 6
+def versionPatch = 4
 def code = 1
 
 android {
@@ -20,6 +20,7 @@ android {
         targetSdkVersion 28
         versionCode code
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,13 +29,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
             applicationVariants.all { variant ->
-                variant.outputs.each { output ->
+                variant.outputs.all { output ->
                     def formattedDate = new Date().format('ddMMMyyyy_HHmm')
                     def newName = output.outputFile.name
                     newName = newName.replace("-release", "_${versionMajor}.${versionMinor}.${versionPatch}_" + formattedDate)
-                    //noinspection GroovyAssignabilityCheck
-//                     output.outputFile = new File(output.outputFile.parent, newName)
-                    //output.outputFileName = new File(output.outputFile.parent, newName)
+                    outputFileName = newName
                 }
             }
         }
