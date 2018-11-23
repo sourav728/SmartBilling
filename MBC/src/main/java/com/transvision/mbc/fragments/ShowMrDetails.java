@@ -78,7 +78,7 @@ import static android.content.ContentValues.TAG;
 public class ShowMrDetails extends Fragment {
     RecyclerView recyclerView;
     Button pdf;
-    TextView show_date, show_subdiv_code, show_mr_count,show_total_records, show_download_count, show_billed_count, show_unbilled_count, holiday;
+    TextView show_date, show_subdiv_code, show_mr_count, show_total_records, show_download_count, show_billed_count, show_unbilled_count, holiday;
     FunctionsCall functioncalls;
 
     boolean previous = false, next = false, oncreate = false;
@@ -96,7 +96,7 @@ public class ShowMrDetails extends Fragment {
 
     String requestUrl = "", subdivisioncode, dum, dd, date;
     int totalmr;
-    int total_download = 0, total_billed = 0, total_unbilled = 0, total_records=0, pd_billed_records=0, d_billed_records=0;
+    int total_download = 0, total_billed = 0, total_unbilled = 0, total_records = 0, pd_billed_records = 0, d_billed_records = 0, bip_val =0;
     String dummy1 = "";
     String datestore = "";
     String day;
@@ -108,6 +108,7 @@ public class ShowMrDetails extends Fragment {
     GetSetValues getsetvalues;
     ArrayList<GetSetValues> arrayList;
     private MRDetailsAdapter mrdetailsAdapter;
+
     public ShowMrDetails() {
     }
 
@@ -255,7 +256,7 @@ public class ShowMrDetails extends Fragment {
 
 
             Log.d("Max val", "val" + max_val);
-            if (updatenextint == 16||updatenextint == 17|| updatenextint == 18|| updatenextint == 19||updatenextint == 20|| updatenextint ==21||updatenextint ==22||updatenextint==23||updatenextint==24||updatenextint ==25||updatenextint ==26||updatenextint ==27||updatenextint ==28||updatenextint ==29||updatenextint == 30||updatenextint ==31) {
+            if (updatenextint == 16 || updatenextint == 17 || updatenextint == 18 || updatenextint == 19 || updatenextint == 20 || updatenextint == 21 || updatenextint == 22 || updatenextint == 23 || updatenextint == 24 || updatenextint == 25 || updatenextint == 26 || updatenextint == 27 || updatenextint == 28 || updatenextint == 29 || updatenextint == 30 || updatenextint == 31) {
                 Toast.makeText(getActivity(), "After 15 no billing!!", Toast.LENGTH_SHORT).show();
             } else {
                 ConnectURL connectURL = new ConnectURL(storecurrentday);
@@ -448,11 +449,10 @@ public class ShowMrDetails extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            // date = dd + "";
-            //showdialog(SUBDIV_DETAILS_SUCCESS);
             total_download = 0;
             total_unbilled = 0;
             total_billed = 0;
+            bip_val = 0;
             super.onPreExecute();
         }
 
@@ -504,133 +504,94 @@ public class ShowMrDetails extends Fragment {
 
                     Log.d("debug", "mr_code is" + mr_code);
 
+                    String bip_count = jsonObject.getString("Bipcount");
                     String downlod_record = jsonObject.getString("Download_Record");
-
                     String download_time = jsonObject.getString("Download_DateTime");
-
                     String billed_record = jsonObject.getString("Billed_Record");
-
                     String billed_time = jsonObject.getString("Billed_DateTime");
                     String ftp_status = jsonObject.getString("Ftp_Status");
                     String Status = jsonObject.getString("Status");
 
-                 /*   String democount = downlod_record;
-                    total_records = total_records + Integer.parseInt(democount);*/
-
-                    if (Status.equals("D"))
-                    {
+                    if (Status.equals("D")) {
                         total_download = total_download + Integer.parseInt(downlod_record);
                         pd_billed_records = pd_billed_records + Integer.parseInt(downlod_record);
-                    }
-                    else
-                    {
-                        //total_download = total_download + 0;
+                    } else {
                         d_billed_records = d_billed_records + Integer.parseInt(downlod_record);
                     }
 
-                    //total_records = total_records + (pd_billed_records + d_billed_records);
-                  /*  total_download = total_download + Integer.parseInt(downlod_record);
-                    if (Status.equals("PD"))
-                    {
-                        total_records = total_records + Integer.parseInt(downlod_record);
-                    }*/
-                    //total_records = total_records + Integer.parseInt(downlod_record);
-
-                   // HashMap<String, String> item = new HashMap<>();
-
+                    if (bip_count.equals(""))
+                        bip_val = bip_val + 0;
+                    else bip_val = bip_val + Integer.parseInt(bip_count);
                     if (billed_record.equals("")) {
-                       // item.put("billed_record", "NA");
                         getsetvalues.setBilled_record("NA");
                         total_billed = total_billed + 0;
 
                     } else {
-                        //item.put("billed_record", billed_record);
                         getsetvalues.setBilled_record(billed_record);
                         total_billed = total_billed + Integer.parseInt(billed_record);
                     }
                     /********FETCHING ONLY DOWNLOADTIME***********/
 
                     if (download_time.equals("")) {
-                       // item.put("download_time", "NA");
                         getsetvalues.setDownload_time("NA");
                     } else {
                         String part2 = download_time.substring(download_time.indexOf(" ") + 1, 16);
-                        //item.put("download_time", part2);
                         getsetvalues.setDownload_time(part2);
                     }
 
                     /******FETCHING ONLY BILLEDTIME*************/
 
                     if (billed_time.equals("")) {
-                        //item.put("billed_time", "NA");
                         getsetvalues.setBilled_time("NA");
                     } else {
                         String part2 = billed_time.substring(billed_time.indexOf(" ") + 1, 16);
-                        //item.put("billed_time", part2);
                         getsetvalues.setBilled_time(part2);
                     }
 
                     /******CHECKING DOWNLOAD RECORD IS EMPTY OR NOT*****/
                     if (downlod_record.equals("")) {
-                        //item.put("downlodrecord", "NA");
                         getsetvalues.setDownlod_record("NA");
                     } else {
-                        //item.put("downlodrecord", downlod_record);
                         getsetvalues.setDownlod_record(downlod_record);
                     }
 
                     /*****FOR UNBILLED************/
 
-                      if (billed_record.equals("")) {
-                            //item.put("unbilled_record", downlod_record);
-                            getsetvalues.setUnbilled_record(downlod_record);
-                            total_unbilled = total_unbilled + Integer.parseInt(downlod_record);
-                        } else {
-                            int val = Integer.parseInt(downlod_record) - Integer.parseInt(billed_record);
-                           // item.put("unbilled_record", val + "");
-                            getsetvalues.setUnbilled_record(val + "");
-                            total_unbilled = total_unbilled + val;
-                        }
+                    if (billed_record.equals("")) {
+                        getsetvalues.setUnbilled_record(downlod_record);
+                        total_unbilled = total_unbilled + Integer.parseInt(downlod_record);
+                    } else {
+                        int val = Integer.parseInt(downlod_record) - Integer.parseInt(billed_record);
+                        getsetvalues.setUnbilled_record(val + "");
+                        total_unbilled = total_unbilled + val;
+                    }
 
 
                     if (Status.equals("D")) {
                         getsetvalues.setStatus("D");
-                        //item.put("Status", "D");
                     } else {
-                        //item.put("Status", "PD");
                         getsetvalues.setStatus("PD");
                     }
                     String mr_code1 = mr_code.substring(6, 8);
                     String mr_code2 = ".." + mr_code1;
-                    //item.put("mrcode", mr_code2);
                     getsetvalues.setMrcode(mr_code2);
-                    //item.put("ftp_status", ftp_status);
-                    //contactList.add(item);
                     arrayList.add(getsetvalues);
                     mrdetailsAdapter.notifyDataSetChanged();
                 }
                 totalmr = arr.length();
             } catch (Exception e) {
                 Log.e(TAG, "Json parsing error: " + e.getMessage());
-                //Toast.makeText(getActivity(), "No values found!!!", Toast.LENGTH_SHORT).show();
             }
 
-          /*  ListAdapter adapter = new SimpleAdapter(getActivity(), contactList,
-                    R.layout.list_item, new String[]{"mrcode", "Status", "downlodrecord", "download_time", "billed_record", "billed_time", "unbilled_record"},
-                    new int[]{R.id.txt_mrcode, R.id.txt_status, R.id.txt_downloaded_record, R.id.txt_download_time, R.id.txt_billed_record, R.id.txt_billed_time, R.id.txt_unbilled_record});
-            lv.setAdapter(adapter);*/
 
             show_subdiv_code.setText(":" + subdivisioncode);
             show_mr_count.setText(":" + totalmr + "");
-            show_total_records.setText(":" + (pd_billed_records + d_billed_records)  + "");
+            //show_total_records.setText(":" + (pd_billed_records + d_billed_records) + "");
+            show_total_records.setText(":" + bip_val);
             Log.d("ARRAY LENGTH", "LENGTH" + totalmr);
-
             show_download_count.setText(":" + total_download + "");
-            //total_download = 0;
             show_billed_count.setText(":" + total_billed + "");
-            //total_billed = 0;
             show_unbilled_count.setText(":" + total_unbilled + "");
-            //total_unbilled = 0;
             show_date.setText(":" + date);
         }
     }

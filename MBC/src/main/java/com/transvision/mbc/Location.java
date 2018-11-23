@@ -5,16 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,6 +36,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,6 +47,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.transvision.mbc.adapters.InfoWindowCustom;
 import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.other.DataParser;
+import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
 import org.apache.commons.lang.StringUtils;
@@ -73,10 +80,8 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
     private GoogleMap mMap;
-    String state = "", country = "", subLocality = "";
-    Double lati,longi;
-    Double double_lati, double_longi;
-    TextView tvdistance;
+    String state = "";
+    Double lati, longi;
     Button location;
     Spinner spinner;
     ArrayList<Polyline> polylines;
@@ -85,28 +90,30 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
     private LatLng destination;
     LatLng latLng;
     TextView tvDistanceDuration;
-    TextView duration_text, distance_text,empty_text,travelmode_text;
-    String loc_lat="",loc_long="", mrname="", mrcode="";
-    String startAddress="",endAddress="",mode="";
+    TextView duration_text, distance_text, empty_text, travelmode_text;
+    String loc_lat = "", loc_long = "", mrname = "", mrcode = "";
+    String startAddress = "", endAddress = "", mode = "";
+    boolean startTrack = false;
+    Marker m;
+    LatLng oldLocation, newLocation;
+    FunctionsCall fcall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         setContentView(R.layout.activity_location);
+        fcall = new FunctionsCall();
         array_list = (ArrayList<GetSetValues>) intent.getSerializableExtra("list");
         //tvDistanceDuration = (TextView) findViewById(R.id.tv_distance_time);
         duration_text = (TextView) findViewById(R.id.txt_duration_value);
         distance_text = (TextView) findViewById(R.id.txt_distance_value);
-
-
         role_list = new ArrayList<>();
         roleAdapter = new RoleAdapter(role_list, this);
-
         loc_lat = intent.getStringExtra("LAT");
         loc_long = intent.getStringExtra("LONG");
         mrname = intent.getStringExtra("MRNAME");
-        mrcode=intent.getStringExtra("MRcode");
+        mrcode = intent.getStringExtra("MRcode");
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -171,21 +178,18 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
     public void onLocationChanged(android.location.Location location) {
 
         mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
+
+        if (mCurrLocationMarker == null) {
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            m = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.walk)).title("Your Location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         }
 
-
         //Showing Current Location Marker on Map
-        latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-
-        mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).title("Your Location"));
-
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String provider = locationManager.getBestProvider(new Criteria(), true);
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -196,25 +200,18 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-
-
-        if (!StringUtils.equalsIgnoreCase(loc_lat,"") && !StringUtils.equalsIgnoreCase(loc_long,"") && !StringUtils.equalsIgnoreCase(loc_lat,"NA") && !StringUtils.equalsIgnoreCase(loc_long,"NA") && !StringUtils.equalsIgnoreCase(loc_lat,"0") && !StringUtils.equalsIgnoreCase(loc_long,"0") && !StringUtils.equalsIgnoreCase(loc_lat,"0.0") && !StringUtils.equalsIgnoreCase(loc_long,"0.0"))
-        {
+        if (!StringUtils.equalsIgnoreCase(loc_lat, "") && !StringUtils.equalsIgnoreCase(loc_long, "") && !StringUtils.equalsIgnoreCase(loc_lat, "NA") && !StringUtils.equalsIgnoreCase(loc_long, "NA") && !StringUtils.equalsIgnoreCase(loc_lat, "0") && !StringUtils.equalsIgnoreCase(loc_long, "0") && !StringUtils.equalsIgnoreCase(loc_lat, "0.0") && !StringUtils.equalsIgnoreCase(loc_long, "0.0")) {
             try {
                 lati = Double.parseDouble(loc_lat);
                 longi = Double.parseDouble(loc_long);
                 mMap.addMarker(new MarkerOptions().title(mrname).snippet(mrcode).position(new LatLng(lati, longi)));
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             Toast.makeText(this, "Location is not available!!", Toast.LENGTH_SHORT).show();
             finish();
         }
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
         polylines = new ArrayList<>();
@@ -222,13 +219,17 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                oldLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                newLocation = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
+                float bearing = (float) fcall.bearingBetweenLocations(oldLocation, newLocation);
+                fcall.rotateMarker(m, bearing);
                 Log.d("debug", "OnInfoClick");
                 String url = getUrl(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new LatLng(marker.getPosition().latitude, marker.getPosition().longitude));
                 Log.d("onMapClick", url.toString());
                 FetchUrl FetchUrl = new FetchUrl();
                 // Start downloading json data from Google Directions API
                 FetchUrl.execute(url);
-
+                startTrack = true;
                 return false;
             }
         });
@@ -276,10 +277,9 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters +"&key=" + MY_API_KEY;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + MY_API_KEY;
         return url;
     }
-
 
     /**
      * A method to download json data from url
@@ -388,22 +388,20 @@ public class Location extends FragmentActivity implements OnMapReadyCallback,
                     lineOptions.color(Color.RED);
                     Log.d("onPostExecute", "onPostExecute lineoptions decoded");
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(Location.this, "Please ckeck your internet connection!!", Toast.LENGTH_SHORT).show();
             }
 
             startAddress = DataParser.mMyAppsBundle.getString("startAddress");
-            Toast.makeText(Location.this, "Start Address.."+startAddress, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Location.this, "Start Address.." + startAddress, Toast.LENGTH_SHORT).show();
             endAddress = DataParser.mMyAppsBundle.getString("endAddress");
-            Toast.makeText(Location.this, "End Address.."+endAddress, Toast.LENGTH_SHORT).show();
-           // mode = DataParser.mMyAppsBundle.getString("travel_mode");
+            Toast.makeText(Location.this, "End Address.." + endAddress, Toast.LENGTH_SHORT).show();
+            // mode = DataParser.mMyAppsBundle.getString("travel_mode");
 
             distance_text.setVisibility(View.VISIBLE);
             duration_text.setVisibility(View.VISIBLE);
-           // travelmode_text.setVisibility(View.VISIBLE);
+            // travelmode_text.setVisibility(View.VISIBLE);
             //empty_text.setVisibility(View.VISIBLE);
 
             distance_text.setText(distance);

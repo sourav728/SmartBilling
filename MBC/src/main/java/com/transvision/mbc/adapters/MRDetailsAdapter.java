@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.transvision.mbc.R;
 import com.transvision.mbc.values.GetSetValues;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 
 /**
@@ -39,12 +41,8 @@ public class MRDetailsAdapter extends RecyclerView.Adapter<MRDetailsAdapter.Deta
         GetSetValues getsetvalues = arrayList.get(position);
         holder.mrcode.setText(getsetvalues.getMrcode());
         holder.download.setText(getsetvalues.getDownlod_record());
-       /* if (getsetvalues.getStatus().equals("PD"))
-        {
-            holder.status.setTextColor(Color.parseColor("#d32f2f"));
-            holder.status.setText(getsetvalues.getStatus());
-        }
-        else*/ holder.status.setText(getsetvalues.getStatus());
+        if (!StringUtils.equalsIgnoreCase(getsetvalues.getDownlod_record(),"0"))
+        holder.status.setText(getsetvalues.getStatus());
         holder.downloadtime.setText(getsetvalues.getDownload_time());
         holder.billed.setText(getsetvalues.getBilled_record());
         holder.billedtime.setText(getsetvalues.getBilled_time());

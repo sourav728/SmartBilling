@@ -23,23 +23,25 @@ import com.transvision.mbc.values.GetSetValues;
 import static android.content.Context.MODE_PRIVATE;
 import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
 import static com.transvision.mbc.values.Constants.PREF_NAME;
+
 public class Apk_Notification extends BroadcastReceiver {
     FunctionsCall functionCalls;
     GetSetValues getSetValues;
     SendingData sendingData;
-    String curr_version="";
+    String curr_version = "";
     Context Notification_context;
     SharedPreferences settings;
-    String server_apk_version="";
+    String server_apk_version = "";
 
     private static Handler handler = null;
+
     {
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case LOGIN_SUCCESS:
-                         functionCalls.logStatus("Server Version:"+getSetValues.getMbc_version());
+                        functionCalls.logStatus("Server Version:" + getSetValues.getMbc_version());
                         if (functionCalls.compare(curr_version, getSetValues.getMbc_version()))
                             notification(getContext().getApplicationContext());
                         break;
@@ -48,6 +50,7 @@ public class Apk_Notification extends BroadcastReceiver {
             }
         };
     }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Notification_context = context;
@@ -55,16 +58,16 @@ public class Apk_Notification extends BroadcastReceiver {
         getSetValues = new GetSetValues();
         sendingData = new SendingData(context);
         settings = context.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("MY_SHARED_PREF",MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
 
-       // server_apk_version = sharedPreferences.getString("APP_VERSION","");
-        functionCalls.logStatus("Apk Notification Current Time: "+functionCalls.currentRecpttime());
+        // server_apk_version = sharedPreferences.getString("APP_VERSION","");
+        functionCalls.logStatus("Apk Notification Current Time: " + functionCalls.currentRecpttime());
 
         PackageInfo pInfo = null;
         try {
             pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             curr_version = pInfo.versionName;
-            functionCalls.logStatus("Current Version: "+curr_version);
+            functionCalls.logStatus("Current Version: " + curr_version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -72,9 +75,10 @@ public class Apk_Notification extends BroadcastReceiver {
         if (functionCalls.checkInternetConnection(context)) {
             functionCalls.logStatus("Checking for newer version of MBC application...");
             SendingData.Login login = sendingData.new Login(getSetValues, handler);
-            login.execute(sharedPreferences.getString("Username",""),sharedPreferences.getString("Password",""));
+            login.execute(sharedPreferences.getString("Username", ""), sharedPreferences.getString("Password", ""));
         } else functionCalls.logStatus("No Internet Connection...");
     }
+
     private Context getContext() {
         return this.Notification_context;
     }
@@ -87,9 +91,9 @@ public class Apk_Notification extends BroadcastReceiver {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.app_update)
-                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.drawable.mbc_icon))
+                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.mbc_icon))
                         .setContentTitle("MBC Insight")
-                        .setContentText("New version Available"+" "+getSetValues.getMbc_version())
+                        .setContentText("New version Available" + " " + getSetValues.getMbc_version())
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH) //must give priority to High, Max which will considered as heads-up notification
                         .setAutoCancel(true);

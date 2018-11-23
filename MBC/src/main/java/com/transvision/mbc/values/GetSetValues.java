@@ -8,7 +8,7 @@ public class GetSetValues implements Serializable {
     private String counter, receiptcount, receipt_amount, date, mode, approved_flag, latitude, longitude;
     private String startaddress;
     private String billed_record, download_time, billed_time, downlod_record, unbilled_record, Status;
-    private String download_record, upload_record, infosys_record;
+    private String download_record, upload_record, infosys_record,bip_count;
 
     public GetSetValues() {
     }
@@ -23,6 +23,14 @@ public class GetSetValues implements Serializable {
 
     public String getUpload_record() {
         return upload_record;
+    }
+
+    public String getBip_count() {
+        return bip_count;
+    }
+
+    public void setBip_count(String bip_count) {
+        this.bip_count = bip_count;
     }
 
     public void setUpload_record(String upload_record) {

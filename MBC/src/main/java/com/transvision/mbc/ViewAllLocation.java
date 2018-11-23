@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.transvision.mbc.adapters.InfoWindowCustom;
 import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.other.DataParser;
+import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
 import org.json.JSONObject;
@@ -88,13 +89,17 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
     private LatLng destination;
     LatLng latLng;
     TextView tvDistanceDuration;
-    TextView duration_text, distance_text, empty_text,travelmode_text;
+    TextView duration_text, distance_text, empty_text, travelmode_text;
     GetSetValues getsetvalues;
-    String startAddress="",endAddress="", mode="";
+    String startAddress = "", endAddress = "", mode = "";
+    Marker m;
+    LatLng oldLocation, newLocation;
+    FunctionsCall fcall;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
+        fcall = new FunctionsCall();
         setContentView(R.layout.activity_location);
         // array_list = (ArrayList<GetSetValues>) intent.getSerializableExtra("list");
         //tvDistanceDuration = (TextView) findViewById(R.id.tv_distance_time);
@@ -103,7 +108,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
 
         Bundle bundle = getIntent().getExtras();
         arrayList = (ArrayList<GetSetValues>) bundle.get("list");
-        Log.d("Debugg","ArrayListSize"+arrayList);
+        Log.d("Debugg", "ArrayListSize" + arrayList);
 
         role_list = new ArrayList<>();
         roleAdapter = new RoleAdapter(role_list, this);
@@ -176,10 +181,13 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
         }
 
         //Showing Current Location Marker on Map
-        latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        mMap.addMarker(new MarkerOptions().title("Your Location").snippet(startAddress).position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        if (mCurrLocationMarker == null) {
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            m = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.walk)).title("Your Location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         String provider = locationManager.getBestProvider(new Criteria(), true);
@@ -195,29 +203,20 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
             return;
         }
 
-
-        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.loc1));
-        //mMap.addMarker(markerOptions).setTitle("" + latLng + "," + subLocality + "," + state + "," + country);
-        // mMap.addMarker(new MarkerOptions().title(mrname).snippet("Mrcode:   " + mrcode).position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-
         /*********FOR DISPLAYING MULTIPLE MARKER ON MAPS***************/
-        for (int i=0;i<arrayList.size();i++)
-        {
-             GetSetValues getsetvalues = arrayList.get(i);
-             lati = getsetvalues.getLatitude();
-             longi = getsetvalues.getLongitude();
-            if (!lati.equals("")&&!longi.equals("")&&!lati.equals("0.0")&&!longi.equals("0.0"))
-            {
+        for (int i = 0; i < arrayList.size(); i++) {
+            GetSetValues getsetvalues = arrayList.get(i);
+            lati = getsetvalues.getLatitude();
+            longi = getsetvalues.getLongitude();
+            if (!lati.equals("") && !longi.equals("") && !lati.equals("0.0") && !longi.equals("0.0")) {
                 try {
                     double_lati = Double.parseDouble(lati);
-                    Log.d("Debugg","Latitude"+double_lati);
+                    Log.d("Debugg", "Latitude" + double_lati);
                     double_longi = Double.parseDouble(longi);
-                    Log.d("Debugg","Longitude"+double_longi);
+                    Log.d("Debugg", "Longitude" + double_longi);
                     mMap.addMarker(new MarkerOptions().title(getsetvalues.getMrcode()).snippet(getsetvalues.getMrname()).position(new LatLng(double_lati, double_longi)));
 
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -235,6 +234,10 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                oldLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                newLocation = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
+                float bearing = (float) fcall.bearingBetweenLocations(oldLocation, newLocation);
+                fcall.rotateMarker(m, bearing);
                 Log.d("debug", "OnInfoClick");
                 String url = getUrl(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), new LatLng(marker.getPosition().latitude, marker.getPosition().longitude));
                 Log.d("onMapClick", url.toString());
@@ -290,7 +293,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&key=" + MY_API_KEY;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + MY_API_KEY;
         return url;
     }
 
@@ -405,9 +408,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
                     lineOptions.color(Color.RED);
                     Log.d("onPostExecute", "onPostExecute lineoptions decoded");
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(ViewAllLocation.this, "Please ckeck your internet connection!!", Toast.LENGTH_SHORT).show();
             }
@@ -415,9 +416,9 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
 
             //Now you can get these values from anywhere like this way:
             startAddress = DataParser.mMyAppsBundle.getString("startAddress");
-            Toast.makeText(ViewAllLocation.this, "Start Address.."+startAddress, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ViewAllLocation.this, "Start Address.." + startAddress, Toast.LENGTH_SHORT).show();
             endAddress = DataParser.mMyAppsBundle.getString("endAddress");
-            Toast.makeText(ViewAllLocation.this, "End Address.."+endAddress, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ViewAllLocation.this, "End Address.." + endAddress, Toast.LENGTH_SHORT).show();
             //mode = DataParser.mMyAppsBundle.getString("travel_mode");
 
             distance_text.setVisibility(View.VISIBLE);
@@ -427,7 +428,7 @@ public class ViewAllLocation extends FragmentActivity implements OnMapReadyCallb
 
             distance_text.setText(distance);
             duration_text.setText(duration);
-           // travelmode_text.setText(mode+" "+"Mode");
+            // travelmode_text.setText(mode+" "+"Mode");
 
             // tvDistanceDuration.setText("Distance:"+distance + ", Duration:"+duration);
             // Drawing polyline in the Google Map for the i-th route

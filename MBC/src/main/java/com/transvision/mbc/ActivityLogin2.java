@@ -175,7 +175,10 @@ public class ActivityLogin2 extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        SavePreferences("TEST_REAL_SERVER", "REAL");
+        sendingData = new SendingData(ActivityLogin2.this);
+
+       /* test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (test_server.isChecked()) {
@@ -186,7 +189,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                     sendingData = new SendingData(ActivityLogin2.this);
                 }
             }
-        });
+        });*/
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
