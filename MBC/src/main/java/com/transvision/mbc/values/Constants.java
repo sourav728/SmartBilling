@@ -10,7 +10,8 @@ public class Constants {
     public static String USERNAME = "Username";
     public static String PASSWORD = "Password";
     //public static String MY_API_KEY = "AIzaSyBfmS43DA3mqv2lvReLPqLhlESkxggqij4";
-    public static String MY_API_KEY = "AIzaSyB7r-0tHNUGgnWbljMlY5AvRej9E5R4ZIE";
+    //public static String MY_API_KEY = "AIzaSyB7r-0tHNUGgnWbljMlY5AvRej9E5R4ZIE";
+    public static String MY_API_KEY = "AIzaSyBkzzbp44Bsw2kClSadmkDWAB2VLG6--m0";
     public static final String FTP_HOST = "ftp2.hescomtrm.com";
     public static final String FTP_USER = "TRMFTP01";
     public static final String FTP_PASS = "TrmFTp1$";
