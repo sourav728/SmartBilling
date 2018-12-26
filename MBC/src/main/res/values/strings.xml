@@ -44,6 +44,12 @@
         <item>AAO</item>
     </string-array>
 
+    <string-array name="login_role3">
+        <item>--SELECT--</item>
+        <item>USER DETAILS</item>
+        <item>AAO</item>
+    </string-array>
+
     <string-array name="dl_mnr">
         <item>--SELECT--</item>
         <item>Feeder Wise</item>

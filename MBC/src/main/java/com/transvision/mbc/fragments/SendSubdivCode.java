@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -23,12 +24,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.transvision.mbc.Location;
+import com.transvision.mbc.MainActivity;
 import com.transvision.mbc.R;
 import com.transvision.mbc.fragments.billing.DL_MNR_Report;
 import com.transvision.mbc.receiver.NetworkChangeReceiver;
 import com.transvision.mbc.values.FunctionsCall;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Calendar;
+
+import static com.transvision.mbc.values.Constants.sPref_ROLE;
 
 /**
  * Created by Sourav on 1/24/2018.
@@ -51,7 +57,8 @@ public class SendSubdivCode extends Fragment {
     FragmentTransaction fragmentTransaction;
     int daycount;
     Button signal_battery;
-
+    SharedPreferences sPref;
+    SharedPreferences.Editor editor;
     public SendSubdivCode() {
         // Required empty public constructor
     }
@@ -81,10 +88,13 @@ public class SendSubdivCode extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
 
+        sPref = ((MainActivity) getActivity()).getsharedPref();
+        editor = sPref.edit();
+        editor.apply();
+
         tv_check_connection = view.findViewById(R.id.tv_check_connection);
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
-
         btnDatePicker = view.findViewById(R.id.btn_date);
         dl_mnr = view.findViewById(R.id.dl_mnr_btn);
         collectiondetails = view.findViewById(R.id.collection_report_btn);
@@ -93,6 +103,10 @@ public class SendSubdivCode extends Fragment {
         location = view.findViewById(R.id.mr_location_demo);
         mrtracking = view.findViewById(R.id.mr_tracking_btn);
         mrapproval = view.findViewById(R.id.mr_approval);
+        Log.d("debug","ROLE " + sPref.getString(sPref_ROLE, ""));
+        if ( StringUtils.startsWithIgnoreCase(sPref.getString(sPref_ROLE, ""), "AAO")) {
+            mrapproval.setVisibility(View.VISIBLE);
+        }else  mrapproval.setVisibility(View.INVISIBLE);
 
         functionsCall = new FunctionsCall();
         Bundle bundle = getArguments();

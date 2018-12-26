@@ -103,6 +103,7 @@
             android:textStyle="bold" />
 
         <Button
+            android:visibility="invisible"
             android:id="@+id/mr_approval"
             android:layout_width="275dp"
             android:layout_height="wrap_content"

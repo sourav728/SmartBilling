@@ -8,7 +8,7 @@ public class GetSetValues implements Serializable {
     private String counter, receiptcount, receipt_amount, date, mode, approved_flag, latitude, longitude;
     private String startaddress;
     private String billed_record, download_time, billed_time, downlod_record, unbilled_record, Status;
-    private String download_record, upload_record, infosys_record,bip_count,approval;
+    private String download_record, upload_record, infosys_record,bip_count,approval,subdivision;
     private boolean isSelected = false;
     public GetSetValues() {
     }
@@ -35,6 +35,14 @@ public class GetSetValues implements Serializable {
 
     public void setDownload_record(String download_record) {
         this.download_record = download_record;
+    }
+
+    public String getSubdivision() {
+        return subdivision;
+    }
+
+    public void setSubdivision(String subdivision) {
+        this.subdivision = subdivision;
     }
 
     public String getUpload_record() {

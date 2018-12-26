@@ -51,7 +51,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.transvision.mbc.values.Constants.BILLING_SERVICE;
+import static com.transvision.mbc.values.Constants.COLLECTION_SERVICE;
 import static com.transvision.mbc.values.Constants.REAL_TRM_URL;
+import static com.transvision.mbc.values.Constants.REAL_TRM_URL2;
 import static com.transvision.mbc.values.Constants.SERVICE;
 import static com.transvision.mbc.values.Constants.SERVICE2;
 import static com.transvision.mbc.values.Constants.TEST_TRM_URL;
@@ -63,7 +65,7 @@ public class SendingData {
     ReceivingData receivingData = new ReceivingData();
     private FunctionsCall functionsCall = new FunctionsCall();
     private String BASEURL,BASE_BILLING_URL;
-    private String BASE_TICKETING_LOGIN;
+    private String BASE_TICKETING_LOGIN,BASE_COLLECTION_URL;
     public SendingData(Context context)
     {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
@@ -80,10 +82,12 @@ public class SendingData {
     {
         if (val == 0)
         {
+            BASE_COLLECTION_URL = TRM_TEST_URL2 + COLLECTION_SERVICE;
             BASE_BILLING_URL = TRM_TEST_URL2 + BILLING_SERVICE;
             BASEURL = TEST_TRM_URL + SERVICE;
             BASE_TICKETING_LOGIN = TEST_TRM_URL + SERVICE2;
         }else {
+            BASE_COLLECTION_URL = REAL_TRM_URL2 + COLLECTION_SERVICE;
             BASE_BILLING_URL = TRM_URL + BILLING_SERVICE;
             BASEURL = REAL_TRM_URL + SERVICE;
             BASE_TICKETING_LOGIN = REAL_TRM_URL + SERVICE2;
@@ -168,14 +172,44 @@ public class SendingData {
         return result.toString();
     }
 
+    @SuppressLint("StaticFieldLeak")
+    public class MR_Login extends AsyncTask<String, String, String> {
+        String response="", mrcode="";
+        Handler handler;
+        GetSetValues getSetValues;
+        public MR_Login(Handler handler, GetSetValues getSetValues) {
+            this.handler = handler;
+            this.getSetValues = getSetValues;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            HashMap<String, String> datamap = new HashMap<>();
+            datamap.put("MRCode", params[0]);
+            datamap.put("DeviceId", params[1]);
+            datamap.put("PASSWORD", params[2]);
+            datamap.put("Date","");
+            functionsCall.logStatus("MRCode: "+mrcode + "\n" + "DeviceID: "+params[1] + "\n" + "Password: "+params[2]);
+            try {
+                response = UrlPostConnection(BASE_COLLECTION_URL+"MRDetails", datamap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            receivingData.getMR_Login_status(result, handler, getSetValues);
+        }
+    }
 
     @SuppressLint("StaticFieldLeak")
     public class Login extends AsyncTask<String, String, String> {
         String response = "";
         GetSetValues getSetValues;
         Handler handler;
-        ArrayList<GetSetValues> arrayList;
-
         public Login(GetSetValues getSetValues, Handler handler) {
             this.getSetValues = getSetValues;
             this.handler = handler;

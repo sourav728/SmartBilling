@@ -1,14 +1,13 @@
 package com.transvision.mbc.posting;
 
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.transvision.mbc.adapters.ApproveAdapter;
 import com.transvision.mbc.adapters.MRAdapter;
 import com.transvision.mbc.adapters.SpinnerAdapter;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
-
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,17 +15,15 @@ import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_FAILURE;
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_SUCCESS;
-import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_FAILURE;
-import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_GRANT_FAILURE;
-import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_GRANT_SUCCESS;
-import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_SUCCESS;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_FAILURE;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_SUCCESS;
 import static com.transvision.mbc.values.Constants.LOGIN_FAILURE;
 import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
 import static com.transvision.mbc.values.Constants.MRTRACKING_FAILURE;
@@ -74,23 +71,27 @@ public class ReceivingData {
         return value;
     }
 
-    //For getting result based on MR LOGIN
-   /* public void getMR_Details(String result, android.os.Handler handler, GetSetValues getSetValues) {
-        String res = parseServerXML(result);
-        Log.d("debug", "Result is" + res);
-        JSONObject jsonObject;
+
+    void getMR_Login_status(String result, Handler handler, GetSetValues getSetValues) {
+        result = parseServerXML(result);
+        functionsCall.logStatus("MR_Login: "+result);
+        JSONArray jsonArray;
         try {
-            jsonObject = new JSONObject(res);
-            String message = jsonObject.getString("message");
-            if (StringUtils.startsWithIgnoreCase(message, "Success"))
-                handler.sendEmptyMessage(LOGIN_SUCCESS);
-            else handler.sendEmptyMessage(LOGIN_FAILURE);
+            jsonArray = new JSONArray(result);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String message = jsonObject.getString("message");
+                if (StringUtils.startsWithIgnoreCase(message, "Success!")) {
+                    getSetValues.setMbc_version(jsonObject.getString("MBC_VERSION"));
+                    getSetValues.setSubdivision(jsonObject.getString("SUBDIVCODE"));
+                    handler.sendEmptyMessage(LOGIN_SUCCESS);
+                } else handler.sendEmptyMessage(LOGIN_FAILURE);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
-            functionsCall.logStatus("JSON Exception Failure!!");
             handler.sendEmptyMessage(LOGIN_FAILURE);
         }
-    }*/
+    }
 
     public void get_Details(String result, GetSetValues getSetValues, android.os.Handler handler) {
         result = parseServerXML(result);
@@ -211,7 +212,7 @@ public class ReceivingData {
     }
 
     //Download Approve Summary
-    public void getDownload_Approve_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, ApproveAdapter approveAdapter) {
+   /* public void getDownload_Approve_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, ApproveAdapter approveAdapter) {
         result = parseServerXML(result);
         JSONArray jsonarray;
         try {
@@ -234,7 +235,7 @@ public class ReceivingData {
             e.printStackTrace();
         }
     }
-
+*/
     //Approve Summary
     public void get_Approve_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, ApproveAdapter approveAdapter) {
         //result = parseServerXML(result);
@@ -257,10 +258,10 @@ public class ReceivingData {
                     arrayList.add(getSetValues);
                     approveAdapter.notifyDataSetChanged();
                 }
-                handler.sendEmptyMessage(DOWNLOAD_APPROVAL_SUCCESS);
-            } else handler.sendEmptyMessage(DOWNLOAD_APPROVAL_FAILURE);
+                handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_SUCCESS);
+            } else handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_FAILURE);
         } catch (JSONException e) {
-            handler.sendEmptyMessage(DOWNLOAD_APPROVAL_FAILURE);
+            handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_FAILURE);
             e.printStackTrace();
         }
     }
@@ -273,11 +274,11 @@ public class ReceivingData {
             JSONObject jsonObject = jsonArray.getJSONObject(0);
             String message = jsonObject.getString("Message");
             if (StringUtils.startsWithIgnoreCase(message, "Success")) {
-                handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_SUCCESS);
-            } else handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_FAILURE);
+                handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS);
+            } else handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE);
         } catch (JSONException e) {
             e.printStackTrace();
-            handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_FAILURE);
+            handler.sendEmptyMessage(DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE);
         }
     }
 

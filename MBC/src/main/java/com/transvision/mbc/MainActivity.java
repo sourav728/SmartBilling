@@ -21,12 +21,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.transvision.mbc.fragments.MR_Approval;
 import com.transvision.mbc.fragments.SendSubdivCode;
 import com.transvision.mbc.other.Apk_Notification;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
 
 import java.util.ArrayList;
+
+import static com.transvision.mbc.values.Constants.PREF_NAME;
+import static com.transvision.mbc.values.Constants.sPref_ROLE;
+import static com.transvision.mbc.values.Constants.sPref_SUBDIVISION;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,15 +43,15 @@ public class MainActivity extends AppCompatActivity
     String subdiv;
     String current_version = "";
     FunctionsCall fcall;
+    SharedPreferences sPref;
+    SharedPreferences.Editor editor;
     public enum Steps {
-        FORM2(SendSubdivCode.class);
-
+        FORM2(SendSubdivCode.class),
+        FORM3(MR_Approval.class);
         private Class clazz;
-
         Steps(Class clazz) {
             this.clazz = clazz;
         }
-
         public Class getFragClass() {
             return clazz;
         }
@@ -55,6 +61,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        editor = sPref.edit();
+        editor.apply();
+
         fcall = new FunctionsCall();
         PackageInfo packageInfo;
         try {
@@ -143,7 +154,9 @@ public class MainActivity extends AppCompatActivity
     public ArrayList<String> gettabs_list() {
         return this.main_tabs_list;
     }
-
+    public SharedPreferences getsharedPref() {
+        return this.sPref;
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -165,8 +178,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_logout:
                 Intent intent = new Intent(MainActivity.this, ActivityLogin2.class);
                 startActivity(intent);
-                SharedPreferences sharedPreferences = getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
+                /*SharedPreferences sharedPreferences = getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();*/
+                editor.putString(sPref_ROLE,"");
+                editor.putString(sPref_SUBDIVISION,"");
                 editor.clear();
                 editor.commit();
                 finish();

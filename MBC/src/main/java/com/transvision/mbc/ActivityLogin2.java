@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -46,35 +47,9 @@ import com.transvision.mbc.other.Apk_Notification;
 import com.transvision.mbc.posting.SendingData;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import static com.transvision.mbc.values.Constants.APK_FILE_DOWNLOADED;
 import static com.transvision.mbc.values.Constants.APK_FILE_NOT_FOUND;
 import static com.transvision.mbc.values.Constants.DLG_APK_NOT_FOUND;
@@ -83,9 +58,9 @@ import static com.transvision.mbc.values.Constants.DLG_APK_UPDATE_SUCCESS;
 import static com.transvision.mbc.values.Constants.DLG_LOGIN;
 import static com.transvision.mbc.values.Constants.LOGIN_FAILURE;
 import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
-import static com.transvision.mbc.values.Constants.PASSWORD;
 import static com.transvision.mbc.values.Constants.PREF_NAME;
-import static com.transvision.mbc.values.Constants.USERNAME;
+import static com.transvision.mbc.values.Constants.sPref_ROLE;
+import static com.transvision.mbc.values.Constants.sPref_SUBDIVISION;
 
 public class ActivityLogin2 extends AppCompatActivity {
 
@@ -93,9 +68,9 @@ public class ActivityLogin2 extends AppCompatActivity {
     GetSetValues getSetValues;
     FunctionsCall fcall;
     Button login_btn;
-    SharedPreferences Mbc;
+    SharedPreferences sPref;
     SharedPreferences.Editor editor;
-    String group = "", current_version = "", DeviceID = "";
+    String group = "", current_version = "", DeviceID = "", login_role = "", device_id="";
     TextView version_code;
     ProgressDialog progressdialog;
     SendingData sendingData;
@@ -103,6 +78,10 @@ public class ActivityLogin2 extends AppCompatActivity {
     CheckBox test_server;
     FTPAPI ftpapi;
     ProgressDialog mProgressDialog = null;
+    ArrayList<GetSetValues> roles_list;
+    RoleAdapter roleAdapter;
+    Spinner role_spinner;
+
     private Handler handler = null;
 
     {
@@ -111,8 +90,8 @@ public class ActivityLogin2 extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case LOGIN_SUCCESS:
-                        SavePreferences("Username",code);
-                        SavePreferences("Password",password);
+                        SavePreferences("Username", code);
+                        SavePreferences("Password", password);
                         progressdialog.dismiss();
                         login_dialog.dismiss();
                         //Below code is for custom toast message
@@ -129,6 +108,9 @@ public class ActivityLogin2 extends AppCompatActivity {
                         toast.setDuration(Toast.LENGTH_SHORT);
                         toast.setView(layout);
                         toast.show();
+                        editor.putString(sPref_ROLE, login_role);
+                        editor.putString(sPref_SUBDIVISION, getSetValues.getSubdivision());
+                        editor.commit();
                         start_version_check();
                         if (fcall.compare(current_version, getSetValues.getMbc_version()))
                             showdialog(DLG_APK_UPDATE_SUCCESS);
@@ -160,11 +142,18 @@ public class ActivityLogin2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window w = getWindow(); // in Activity's onCreate() for instance
             w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        }*/
         initialize();
+
+        for (int i = 0; i < getResources().getStringArray(R.array.login_role3).length; i++) {
+            getSetValues = new GetSetValues();
+            getSetValues.setLogin_role(getResources().getStringArray(R.array.login_role3)[i]);
+            roles_list.add(getSetValues);
+            roleAdapter.notifyDataSetChanged();
+        }
 
         PackageInfo packageInfo;
         try {
@@ -175,8 +164,8 @@ public class ActivityLogin2 extends AppCompatActivity {
             e.printStackTrace();
         }
 
-      /*  SavePreferences("TEST_REAL_SERVER", "REAL");
-        sendingData = new SendingData(ActivityLogin2.this);*/
+        SavePreferences("TEST_REAL_SERVER", "REAL");
+        sendingData = new SendingData(ActivityLogin2.this);
 
         test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -191,10 +180,22 @@ public class ActivityLogin2 extends AppCompatActivity {
             }
         });
 
+        role_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                GetSetValues roledetails = roles_list.get(position);
+                login_role = roledetails.getLogin_role();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
                 if (ActivityCompat.checkSelfPermission(ActivityLogin2.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -205,9 +206,16 @@ public class ActivityLogin2 extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                Log.d("Debug", "Device ID" + DeviceID);
+
+                if (tm != null)
+                //    device_id = tm.getDeviceId();
+                  device_id = "357869083548989";
+
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
-                    showdialog(DLG_LOGIN);
+                    if (!StringUtils.startsWithIgnoreCase(login_role, "--SELECT--"))
+                        showdialog(DLG_LOGIN);
+                    else
+                        Toast.makeText(ActivityLogin2.this, "Please Select Login Role!!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(ActivityLogin2.this, "Please connect to internet..", Toast.LENGTH_SHORT).show();
                 }
@@ -219,8 +227,8 @@ public class ActivityLogin2 extends AppCompatActivity {
     public void showdialog(int id) {
         Dialog dialog;
         LinearLayout linearLayout = (LinearLayout) this.getLayoutInflater().inflate(R.layout.subdiv_login_screen, null);
-        final EditText et_login_id =  linearLayout.findViewById(R.id.et_admin_id);
-        final EditText et_pass =  linearLayout.findViewById(R.id.et_admin_password);
+        final EditText et_login_id = linearLayout.findViewById(R.id.et_admin_id);
+        final EditText et_pass = linearLayout.findViewById(R.id.et_admin_password);
         switch (id) {
 
             case DLG_LOGIN:
@@ -229,10 +237,10 @@ public class ActivityLogin2 extends AppCompatActivity {
                 login_dlg.setCancelable(false);
                 RelativeLayout dlg_linear = (RelativeLayout) this.getLayoutInflater().inflate(R.layout.login_layout, null);
                 login_dlg.setView(dlg_linear);
-                final EditText et_loginid =  dlg_linear.findViewById(R.id.et_login_id);
-                final EditText et_password =  dlg_linear.findViewById(R.id.et_login_password);
+                final EditText et_loginid = dlg_linear.findViewById(R.id.et_login_id);
+                final EditText et_password = dlg_linear.findViewById(R.id.et_login_password);
                 final Button login_btn = dlg_linear.findViewById(R.id.dialog_positive_btn);
-                final Button cancel_btn =  dlg_linear.findViewById(R.id.dialog_negative_btn);
+                final Button cancel_btn = dlg_linear.findViewById(R.id.dialog_negative_btn);
 
                 login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -248,14 +256,18 @@ public class ActivityLogin2 extends AppCompatActivity {
                                     if (!TextUtils.isEmpty(code)) {
                                         password = et_password.getText().toString();
                                         if (!TextUtils.isEmpty(password)) {
-
                                             progressdialog = new ProgressDialog(ActivityLogin2.this, R.style.MyProgressDialogstyle);
                                             progressdialog.setTitle("Checking Credentials");
                                             progressdialog.setMessage("Please Wait..");
                                             progressdialog.show();
 
-                                            SendingData.Login login = sendingData.new Login(getSetValues, handler);
-                                            login.execute(code, password);
+                                            if (!StringUtils.startsWithIgnoreCase(login_role, "AAO")) {
+                                                SendingData.Login login = sendingData.new Login(getSetValues, handler);
+                                                login.execute(code, password);
+                                            } else {
+                                                SendingData.MR_Login login = sendingData.new MR_Login(handler,getSetValues);
+                                                login.execute(code,device_id, password);
+                                            }
                                         } else
                                             et_password.setError(getResources().getString(R.string.dialog_login_password_error));
                                     } else
@@ -273,8 +285,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                     }
                 });
                 login_dialog.show();
-                ( login_dialog).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.MAGENTA);
-                ( login_dialog).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+                (login_dialog).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.MAGENTA);
+                (login_dialog).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
                 break;
 
             case DLG_APK_UPDATE_SUCCESS:
@@ -324,23 +336,27 @@ public class ActivityLogin2 extends AppCompatActivity {
         }
     }
 
-    private void move_to_next_activity()
-    {
+    private void move_to_next_activity() {
         Intent intent = new Intent(ActivityLogin2.this, MainActivity.class);
         intent.putExtra("subdivcode", code);
         startActivity(intent);
         finish();
     }
+
     private void initialize() {
         ftpapi = new FTPAPI();
-        login_btn =  findViewById(R.id.login_btn);
+        login_btn = findViewById(R.id.login_btn);
         fcall = new FunctionsCall();
-        version_code =  findViewById(R.id.txt_version_code);
+        version_code = findViewById(R.id.txt_version_code);
         sendingData = new SendingData(this);
-        test_server =  findViewById(R.id.checkbox);
+        test_server = findViewById(R.id.checkbox);
         getSetValues = new GetSetValues();
-        Mbc = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        editor = Mbc.edit();
+        sPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        role_spinner = findViewById(R.id.login_users_spin);
+        roles_list = new ArrayList<>();
+        roleAdapter = new RoleAdapter(roles_list, this);
+        role_spinner.setAdapter(roleAdapter);
+        editor = sPref.edit();
         editor.apply();
     }
 
@@ -350,6 +366,7 @@ public class ActivityLogin2 extends AppCompatActivity {
         editor.putString(key, value);
         editor.commit();
     }
+
     private void start_version_check() {
         fcall.logStatus("Version_receiver Checking..");
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
