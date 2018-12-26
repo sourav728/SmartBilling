@@ -1,11 +1,15 @@
 package com.transvision.mbc.values;
 
 public class Constants {
-
+    public static String TRM_URL = "http://abc_service2.hescomtrm.com/";
+    public static String TRM_TEST_URL = "http://test_abc_service2.hescomtrm.com/";
+    public static String TRM_TEST_URL2 = "http://test_abc_service.hescomtrm.com/";
     public static String TEST_TRM_URL = "http://test_bc_service.hescomtrm.com/";
     public static String REAL_TRM_URL = "http://bc_service2.hescomtrm.com/";
     public static String SERVICE = "Service.asmx/";
     public static String SERVICE2 = "TicketingService.asmx/";
+    public static String COLLECTION_SERVICE = "Service_Collection.asmx/";
+    public static String BILLING_SERVICE = "Service_Billing.asmx/";
     public static String PREF_NAME = "TRM_MBC";
     public static String USERNAME = "Username";
     public static String PASSWORD = "Password";
@@ -31,4 +35,13 @@ public class Constants {
     public static final int APK_FILE_NOT_FOUND = 13;
     public static final int DLG_APK_NOT_FOUND = 14;
     public static final int APK_NOTIFICATION = 15;
+    public static final int DOWNLOAD_APPROVAL_SUCCESS = 16;
+    public static final int DOWNLOAD_APPROVAL_FAILURE = 17;
+    public static final int DOWNLOAD_APPROVAL_GRANT_SUCCESS = 18;
+    public static final int DOWNLOAD_APPROVAL_GRANT_FAILURE = 19;
+    public static final int UPLOAD_APPROVAL_SUCCESS = 20;
+    public static final int UPLOAD_APPROVAL_FAILURE = 21;
+    public static final int UPLOAD_APPROVAL_GRANT_SUCCESS = 22;
+    public static final int UPLOAD_APPROVAL_GRANT_FAILURE = 24;
+
 }

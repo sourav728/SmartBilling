@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 
 import com.transvision.mbc.R;
+import com.transvision.mbc.adapters.ApproveAdapter;
 import com.transvision.mbc.adapters.MRAdapter;
 import com.transvision.mbc.adapters.RoleAdapter;
 import com.transvision.mbc.adapters.SpinnerAdapter;
@@ -49,16 +50,19 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.transvision.mbc.values.Constants.BILLING_SERVICE;
 import static com.transvision.mbc.values.Constants.REAL_TRM_URL;
 import static com.transvision.mbc.values.Constants.SERVICE;
 import static com.transvision.mbc.values.Constants.SERVICE2;
 import static com.transvision.mbc.values.Constants.TEST_TRM_URL;
+import static com.transvision.mbc.values.Constants.TRM_TEST_URL2;
+import static com.transvision.mbc.values.Constants.TRM_URL;
 
 public class SendingData {
 
     ReceivingData receivingData = new ReceivingData();
     private FunctionsCall functionsCall = new FunctionsCall();
-    private String BASEURL;
+    private String BASEURL,BASE_BILLING_URL;
     private String BASE_TICKETING_LOGIN;
     public SendingData(Context context)
     {
@@ -76,9 +80,11 @@ public class SendingData {
     {
         if (val == 0)
         {
+            BASE_BILLING_URL = TRM_TEST_URL2 + BILLING_SERVICE;
             BASEURL = TEST_TRM_URL + SERVICE;
             BASE_TICKETING_LOGIN = TEST_TRM_URL + SERVICE2;
         }else {
+            BASE_BILLING_URL = TRM_URL + BILLING_SERVICE;
             BASEURL = REAL_TRM_URL + SERVICE;
             BASE_TICKETING_LOGIN = REAL_TRM_URL + SERVICE2;
         }
@@ -195,7 +201,6 @@ public class SendingData {
         }
     }
 
-
     //Send subdivcode request
     @SuppressLint("StaticFieldLeak")
     public class SendSubdivCodeRequest extends AsyncTask<String, String, String> {
@@ -297,6 +302,98 @@ public class SendingData {
             receivingData.getMrTracking_Summary(result, handler,arrayList,getSetValues,mrAdapter);
         }
     }
+    //Download Approval
+ /*   public class Download_Approval extends AsyncTask<String, String, String> {
+        String response = "";
+        Handler handler;
+        GetSetValues getSetValues;
+        ArrayList<GetSetValues>arrayList;
+        ApproveAdapter approveAdapter;
 
+        public Download_Approval(Handler handler, ArrayList<GetSetValues>arrayList,GetSetValues getSetValues,ApproveAdapter approveAdapter)
+        {
+            this.handler = handler;
+            this.getSetValues = getSetValues;
+            this.arrayList = arrayList;
+            this.approveAdapter = approveAdapter;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            HashMap<String, String> datamap = new HashMap<>();
+            datamap.put("SubDivCode", params[0]);
+            try {
+                response = UrlPostConnection("http://test_bc_service.hescomtrm.com/ReadFile.asmx/MR_FETCH", datamap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return response;
+        }
 
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            receivingData.getDownload_Approve_Summary(result, handler,arrayList,getSetValues,approveAdapter);
+        }
+    }*/
+
+    //MR_Approval
+    public class Approval_Details extends AsyncTask<String, String, String> {
+        String response = "";
+        Handler handler;
+        GetSetValues getSetValues;
+        ArrayList<GetSetValues>arrayList;
+        ApproveAdapter approveAdapter;
+        public Approval_Details(Handler handler,ArrayList<GetSetValues>arrayList,GetSetValues getSetValues,ApproveAdapter approveAdapter) {
+            this.handler = handler;
+            this.arrayList = arrayList;
+            this.getSetValues = getSetValues;
+            this.approveAdapter = approveAdapter;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            HashMap<String, String> datamap = new HashMap<>();
+            datamap.put("Subdivision", params[0]);
+            datamap.put("Flag",params[1]);
+            try {
+                response = UrlPostConnection(BASE_BILLING_URL + "Approval_Details", datamap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            receivingData.get_Approve_Summary(result, handler,arrayList,getSetValues,approveAdapter);
+        }
+    }
+
+    //MR_Approved
+    public class MR_Approved extends AsyncTask<String, String, String> {
+        String response = "";
+        Handler handler;
+
+        public MR_Approved(Handler handler) {
+            this.handler = handler;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            HashMap<String, String> datamap = new HashMap<>();
+            datamap.put("MRcode", params[0]);
+            datamap.put("Flag",params[1]);
+            try {
+                response = UrlPostConnection(BASE_BILLING_URL + "MR_Approved", datamap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            receivingData.get_Approve_Details(result,handler);
+        }
+    }
 }

@@ -71,14 +71,11 @@ import static com.transvision.mbc.values.Constants.SUBDIV_DETAILS_SUCCESS;
  * Created by Sourav
  */
 public class MRTrackingFragment extends Fragment {
-    /*ListView lv;*/
     RecyclerView recyclerView;
     private BroadcastReceiver mNetworkReceiver;
     GetSetValues getSetValues, getSet;
-    String MRCODE, MRNAME, MOBILE_NO, DEVICE_ID,LONGITUDE,LATITUDE;
     FunctionsCall functionsCall;
     public static final String GETSET = "getset";
-
     ArrayList<GetSetValues> arrayList;
     private MRAdapter mrAdapter;
     String subdivisioncode="";
@@ -114,29 +111,18 @@ public class MRTrackingFragment extends Fragment {
         //tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
         Bundle bundle = getArguments();
         if (bundle!= null)
-        {
             subdivisioncode = bundle.getString("subdivcode");
-        }
-
         arrayList = new ArrayList<>();
-
         setHasOptionsMenu(true);
-
         recyclerView = (RecyclerView) view.findViewById(R.id.mrtrack_recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         mrAdapter = new MRAdapter(getActivity(), arrayList, getSetValues);
         recyclerView.setAdapter(mrAdapter);
-
         functionsCall = new FunctionsCall();
         sendingData = new SendingData(getContext());
-        /*ConnectURL connectURL = new ConnectURL();
-        connectURL.execute();
-*/
         SendingData.MRTracking mrTracking = sendingData.new MRTracking(handler, arrayList, getSetValues, mrAdapter);
         mrTracking.execute(subdivisioncode);
-
         return view;
     }
 

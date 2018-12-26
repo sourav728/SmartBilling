@@ -60,6 +60,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="155dp"
-        android:gravity="center"
-        />
+        android:gravity="center" />
 </RelativeLayout>

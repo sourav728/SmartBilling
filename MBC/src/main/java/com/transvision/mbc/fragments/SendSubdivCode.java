@@ -44,13 +44,14 @@ public class SendSubdivCode extends Fragment {
     Boolean flag = false;
     int count = 0;
     ProgressDialog progressDialog;
-    static Button btn_sendsubdiv_code, btnDatePicker, btn_subdivwise_summary,dl_mnr, collectiondetails, mrtracking, location;
+    static Button btn_sendsubdiv_code, btnDatePicker, btn_subdivwise_summary, dl_mnr, collectiondetails, mrtracking, location, mrapproval;
     String subdiv_code, date, dd, unbilled;
-    String subdivisioncode, dum ;
+    String subdivisioncode, dum;
     private int mYear, mMonth, mDay;
     FragmentTransaction fragmentTransaction;
     int daycount;
     Button signal_battery;
+
     public SendSubdivCode() {
         // Required empty public constructor
     }
@@ -78,26 +79,24 @@ public class SendSubdivCode extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
+        View view = inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
 
-        tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
+        tv_check_connection = view.findViewById(R.id.tv_check_connection);
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
 
-        btnDatePicker = (Button) view.findViewById(R.id.btn_date);
-        dl_mnr = (Button) view.findViewById(R.id.dl_mnr_btn);
-        collectiondetails = (Button) view.findViewById(R.id.collection_report_btn);
-        btn_subdivwise_summary = (Button) view.findViewById(R.id.subdiv_summary);
-        signal_battery = (Button) view.findViewById(R.id.mr_signal_battery_info);
-
-        location = (Button) view.findViewById(R.id.mr_location_demo);
-
-        mrtracking = (Button) view.findViewById(R.id.mr_tracking_btn);
+        btnDatePicker = view.findViewById(R.id.btn_date);
+        dl_mnr = view.findViewById(R.id.dl_mnr_btn);
+        collectiondetails = view.findViewById(R.id.collection_report_btn);
+        btn_subdivwise_summary = view.findViewById(R.id.subdiv_summary);
+        signal_battery = view.findViewById(R.id.mr_signal_battery_info);
+        location = view.findViewById(R.id.mr_location_demo);
+        mrtracking = view.findViewById(R.id.mr_tracking_btn);
+        mrapproval = view.findViewById(R.id.mr_approval);
 
         functionsCall = new FunctionsCall();
         Bundle bundle = getArguments();
-        if (bundle!= null)
-        {
+        if (bundle != null) {
             subdivisioncode = bundle.getString("subdivcode");
         }
 
@@ -117,20 +116,20 @@ public class SendSubdivCode extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                dd =(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                                dd = (year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
 
                                 dum = functionsCall.Parse_Date2(dd);
 
                                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                                 Bundle bundle = new Bundle();
-                                bundle.putString("flag","One");
+                                bundle.putString("flag", "One");
                                 bundle.putString("date", dum);
-                                bundle.putString("dd",dd);
-                                bundle.putString("daycount", daycount+"");
+                                bundle.putString("dd", dd);
+                                bundle.putString("daycount", daycount + "");
 
                                 selectSubdivision.setArguments(bundle);
                                 fragmentTransaction = getFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.container_main,selectSubdivision).addToBackStack(null).commit();
+                                fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
                             }
                         }, mYear, mMonth, mDay);
@@ -154,18 +153,14 @@ public class SendSubdivCode extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                if (mDay<9)
-                                {
+                                if (mDay < 9) {
                                     String val = "0";
-                                    dd =(year + "-" + (monthOfYear + 1) + "-" + val+dayOfMonth);
+                                    dd = (year + "-" + (monthOfYear + 1) + "-" + val + dayOfMonth);
+
+                                } else {
+                                    dd = (year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
 
                                 }
-                                else
-                                {
-                                    dd =(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
-                                }
-
                                 dum = functionsCall.Parse_Date2(dd);
                                 Toast.makeText(getActivity(), "Moveing to next fragment!!", Toast.LENGTH_SHORT).show();
 
@@ -173,23 +168,22 @@ public class SendSubdivCode extends Fragment {
                         }, mYear, mMonth, mDay);
 
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-                Log.d("Debug","Current Time"+System.currentTimeMillis());
+                Log.d("Debug", "Current Time" + System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });
-
         btn_subdivwise_summary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                 Bundle bundle = new Bundle();
-                bundle.putString("flag","Two");
+                bundle.putString("flag", "Two");
 
                 selectSubdivision.setArguments(bundle);
 
                 fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main,selectSubdivision).addToBackStack(null).commit();
+                fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
             }
         });
 
@@ -213,12 +207,12 @@ public class SendSubdivCode extends Fragment {
                 fragmentTransaction.replace(R.id.container_main, collection).addToBackStack(null).commit();*/
                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                 Bundle bundle = new Bundle();
-                bundle.putString("flag","Three");
+                bundle.putString("flag", "Three");
 
                 selectSubdivision.setArguments(bundle);
 
                 fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main,selectSubdivision).addToBackStack(null).commit();
+                fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
             }
         });
@@ -231,10 +225,10 @@ public class SendSubdivCode extends Fragment {
                 fragmentTransaction.replace(R.id.container_main,mrTrackingFragment).addToBackStack(null).commit();*/
                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                 Bundle bundle = new Bundle();
-                bundle.putString("flag","Four");
+                bundle.putString("flag", "Four");
                 selectSubdivision.setArguments(bundle);
                 fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main,selectSubdivision).addToBackStack(null).commit();
+                fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
             }
         });
@@ -251,14 +245,22 @@ public class SendSubdivCode extends Fragment {
             public void onClick(View v) {
                 Battery_Signal_Info battery_signal_info = new Battery_Signal_Info();
                 fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main,battery_signal_info).addToBackStack(null).commit();
+                fragmentTransaction.replace(R.id.container_main, battery_signal_info).addToBackStack(null).commit();
             }
         });
-
-        return  view;
+        mrapproval.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MR_Approval mr_approval = new MR_Approval();
+                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.container_main, mr_approval).addToBackStack(null).commit();
+            }
+        });
+        return view;
     }
-    public static void dialog(boolean value){
-        if(value){
+
+    public static void dialog(boolean value) {
+        if (value) {
             tv_check_connection.setText("Back Online");
             tv_check_connection.setBackgroundColor(Color.parseColor("#558B2F"));
             tv_check_connection.setTextColor(Color.WHITE);
@@ -274,7 +276,7 @@ public class SendSubdivCode extends Fragment {
             btn_subdivwise_summary.setEnabled(true);
             collectiondetails.setEnabled(true);
             mrtracking.setEnabled(true);
-        }else {
+        } else {
             tv_check_connection.setVisibility(View.VISIBLE);
             tv_check_connection.setText("No Internet Connection!!");
             tv_check_connection.setBackgroundColor(Color.RED);
@@ -285,15 +287,14 @@ public class SendSubdivCode extends Fragment {
             mrtracking.setEnabled(false);
         }
     }
-    private void showdialog(int id)
-    {
-        switch (id)
-        {
+
+    private void showdialog(int id) {
+        switch (id) {
             case DLG_SUCCESS:
-                progressDialog = ProgressDialog.show(getActivity(),"Wait for a second...","Success",true);
+                progressDialog = ProgressDialog.show(getActivity(), "Wait for a second...", "Success", true);
                 break;
             case DLG_FAILURE:
-                progressDialog = ProgressDialog.show(getActivity(),"Wiat for a second...", "Failure", true);
+                progressDialog = ProgressDialog.show(getActivity(), "Wiat for a second...", "Failure", true);
                 break;
         }
     }
@@ -306,14 +307,11 @@ public class SendSubdivCode extends Fragment {
             getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
-    protected void unregisterNetworkChanges()
-    {
-        try
-        {
+
+    protected void unregisterNetworkChanges() {
+        try {
             getActivity().unregisterReceiver(mNetworkReceiver);
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
     }

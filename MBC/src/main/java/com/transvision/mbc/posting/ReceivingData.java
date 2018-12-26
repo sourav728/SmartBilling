@@ -1,7 +1,9 @@
 package com.transvision.mbc.posting;
 
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.transvision.mbc.adapters.ApproveAdapter;
 import com.transvision.mbc.adapters.MRAdapter;
 import com.transvision.mbc.adapters.SpinnerAdapter;
 import com.transvision.mbc.values.FunctionsCall;
@@ -21,6 +23,10 @@ import java.util.ArrayList;
 
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_FAILURE;
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_SUCCESS;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_FAILURE;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_GRANT_FAILURE;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_GRANT_SUCCESS;
+import static com.transvision.mbc.values.Constants.DOWNLOAD_APPROVAL_SUCCESS;
 import static com.transvision.mbc.values.Constants.LOGIN_FAILURE;
 import static com.transvision.mbc.values.Constants.LOGIN_SUCCESS;
 import static com.transvision.mbc.values.Constants.MRTRACKING_FAILURE;
@@ -153,7 +159,7 @@ public class ReceivingData {
 
     //MR Tracking Summary
     public void getMrTracking_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, MRAdapter mrAdapter) {
-         result = parseServerXML(result);
+        result = parseServerXML(result);
         JSONArray jsonarray;
         try {
             jsonarray = new JSONArray(result);
@@ -203,4 +209,76 @@ public class ReceivingData {
             e.printStackTrace();
         }
     }
+
+    //Download Approve Summary
+    public void getDownload_Approve_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, ApproveAdapter approveAdapter) {
+        result = parseServerXML(result);
+        JSONArray jsonarray;
+        try {
+            jsonarray = new JSONArray(result);
+            if (jsonarray.length() > 0) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject jsonObject = jsonarray.getJSONObject(i);
+                    getSetValues = new GetSetValues();
+                    String MRCODE = jsonObject.getString("MRCODE");
+                    Log.d("Debug", "Mrcode" + MRCODE);
+                    if (!MRCODE.equals(""))
+                        getSetValues.setMrcode(MRCODE);
+                    else getSetValues.setMrcode("NA");
+                    arrayList.add(getSetValues);
+                    approveAdapter.notifyDataSetChanged();
+                }
+                handler.sendEmptyMessage(DOWNLOAD_APPROVAL_SUCCESS);
+            } else handler.sendEmptyMessage(DOWNLOAD_APPROVAL_FAILURE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Approve Summary
+    public void get_Approve_Summary(String result, android.os.Handler handler, ArrayList<GetSetValues> arrayList, GetSetValues getSetValues, ApproveAdapter approveAdapter) {
+        //result = parseServerXML(result);
+        JSONArray jsonarray;
+        try {
+            jsonarray = new JSONArray(result);
+            if (jsonarray.length() > 0) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject jsonObject = jsonarray.getJSONObject(i);
+                    getSetValues = new GetSetValues();
+                    String approve = jsonObject.getString("Approval");
+                    Log.d("Debug", "Approve" + approve);
+                    if (!TextUtils.isEmpty(approve)) {
+                        String mr = approve.substring(0, 8);
+                        String dat = approve.substring(9, approve.length());
+                        getSetValues.setMrcode(mr);
+                        getSetValues.setDate(dat);
+
+                    }
+                    arrayList.add(getSetValues);
+                    approveAdapter.notifyDataSetChanged();
+                }
+                handler.sendEmptyMessage(DOWNLOAD_APPROVAL_SUCCESS);
+            } else handler.sendEmptyMessage(DOWNLOAD_APPROVAL_FAILURE);
+        } catch (JSONException e) {
+            handler.sendEmptyMessage(DOWNLOAD_APPROVAL_FAILURE);
+            e.printStackTrace();
+        }
+    }
+
+    public void get_Approve_Details(String result, android.os.Handler handler) {
+        //result = parseServerXML(result);
+        JSONArray jsonArray;
+        try {
+            jsonArray = new JSONArray(result);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            String message = jsonObject.getString("Message");
+            if (StringUtils.startsWithIgnoreCase(message, "Success")) {
+                handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_SUCCESS);
+            } else handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_FAILURE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            handler.sendEmptyMessage(DOWNLOAD_APPROVAL_GRANT_FAILURE);
+        }
+    }
+
 }

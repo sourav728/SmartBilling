@@ -175,10 +175,10 @@ public class ActivityLogin2 extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        SavePreferences("TEST_REAL_SERVER", "REAL");
-        sendingData = new SendingData(ActivityLogin2.this);
+      /*  SavePreferences("TEST_REAL_SERVER", "REAL");
+        sendingData = new SendingData(ActivityLogin2.this);*/
 
-       /* test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (test_server.isChecked()) {
@@ -189,7 +189,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                     sendingData = new SendingData(ActivityLogin2.this);
                 }
             }
-        });*/
+        });
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,8 +219,8 @@ public class ActivityLogin2 extends AppCompatActivity {
     public void showdialog(int id) {
         Dialog dialog;
         LinearLayout linearLayout = (LinearLayout) this.getLayoutInflater().inflate(R.layout.subdiv_login_screen, null);
-        final EditText et_login_id = (EditText) linearLayout.findViewById(R.id.et_admin_id);
-        final EditText et_pass = (EditText) linearLayout.findViewById(R.id.et_admin_password);
+        final EditText et_login_id =  linearLayout.findViewById(R.id.et_admin_id);
+        final EditText et_pass =  linearLayout.findViewById(R.id.et_admin_password);
         switch (id) {
 
             case DLG_LOGIN:
@@ -229,10 +229,10 @@ public class ActivityLogin2 extends AppCompatActivity {
                 login_dlg.setCancelable(false);
                 RelativeLayout dlg_linear = (RelativeLayout) this.getLayoutInflater().inflate(R.layout.login_layout, null);
                 login_dlg.setView(dlg_linear);
-                final EditText et_loginid = (EditText) dlg_linear.findViewById(R.id.et_login_id);
-                final EditText et_password = (EditText) dlg_linear.findViewById(R.id.et_login_password);
-                final Button login_btn = (Button) dlg_linear.findViewById(R.id.dialog_positive_btn);
-                final Button cancel_btn = (Button) dlg_linear.findViewById(R.id.dialog_negative_btn);
+                final EditText et_loginid =  dlg_linear.findViewById(R.id.et_login_id);
+                final EditText et_password =  dlg_linear.findViewById(R.id.et_login_password);
+                final Button login_btn = dlg_linear.findViewById(R.id.dialog_positive_btn);
+                final Button cancel_btn =  dlg_linear.findViewById(R.id.dialog_negative_btn);
 
                 login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -273,8 +273,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                     }
                 });
                 login_dialog.show();
-                ((AlertDialog) login_dialog).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.MAGENTA);
-                ((AlertDialog) login_dialog).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
+                ( login_dialog).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.MAGENTA);
+                ( login_dialog).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED);
                 break;
 
             case DLG_APK_UPDATE_SUCCESS:
@@ -333,11 +333,11 @@ public class ActivityLogin2 extends AppCompatActivity {
     }
     private void initialize() {
         ftpapi = new FTPAPI();
-        login_btn = (Button) findViewById(R.id.login_btn);
+        login_btn =  findViewById(R.id.login_btn);
         fcall = new FunctionsCall();
-        version_code = (TextView) findViewById(R.id.txt_version_code);
+        version_code =  findViewById(R.id.txt_version_code);
         sendingData = new SendingData(this);
-        test_server = (CheckBox) findViewById(R.id.checkbox);
+        test_server =  findViewById(R.id.checkbox);
         getSetValues = new GetSetValues();
         Mbc = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         editor = Mbc.edit();
@@ -362,9 +362,4 @@ public class ActivityLogin2 extends AppCompatActivity {
         } else fcall.logStatus("Version_receiver Already running..");
     }
 
-   /* @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mProgressDialog.dismiss();
-    }*/
 }

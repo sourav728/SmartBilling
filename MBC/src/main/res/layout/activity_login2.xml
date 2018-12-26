@@ -32,7 +32,6 @@
                 android:textSize="@dimen/text18" />
 
             <CheckBox
-                android:visibility="gone"
                 android:id="@+id/checkbox"
                 android:layout_width="147dp"
                 android:layout_height="wrap_content"

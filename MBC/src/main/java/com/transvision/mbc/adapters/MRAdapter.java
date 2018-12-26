@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class MRAdapter extends RecyclerView.Adapter<MRAdapter.TicketHolder> implements Filterable {
     String latitude = "", longitude = "", MRname = "", MRcode = "";
     private static int currentPosition = 0;
-    private ArrayList<GetSetValues> arrayList = new ArrayList<>();
+    private ArrayList<GetSetValues> arrayList;
     private ArrayList<GetSetValues> filteredList;
     private Context context;
     private GetSetValues getSetValues;
