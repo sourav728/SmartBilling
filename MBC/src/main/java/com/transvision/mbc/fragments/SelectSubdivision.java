@@ -1,6 +1,7 @@
 package com.transvision.mbc.fragments;
 
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -55,6 +57,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -64,6 +67,7 @@ import static com.transvision.mbc.values.Constants.SUBDIV_DETAILS_FAILURE;
 import static com.transvision.mbc.values.Constants.SUBDIV_DETAILS_SUCCESS;
 
 public class SelectSubdivision extends Fragment {
+    @SuppressLint("StaticFieldLeak")
     static Button submit;
     FragmentTransaction fragmentTransaction;
     Spinner subdivspinner;
@@ -74,6 +78,7 @@ public class SelectSubdivision extends Fragment {
     String dum = "", dd = "", day = "", flag = "";
     ProgressDialog progressDialog;
     private BroadcastReceiver mNetworkReceiver;
+    @SuppressLint("StaticFieldLeak")
     static TextView tv_check_connection;
     SendingData sendingData;
 
@@ -86,11 +91,11 @@ public class SelectSubdivision extends Fragment {
                 switch (msg.what) {
                     case SUBDIV_DETAILS_SUCCESS:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                         break;
                     case SUBDIV_DETAILS_FAILURE:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Failure!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failure!!", Toast.LENGTH_SHORT).show();
                         break;
                 }
                 super.handleMessage(msg);
@@ -99,46 +104,38 @@ public class SelectSubdivision extends Fragment {
     }
 
     public SelectSubdivision() {
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_subdivision, container, false);
-        submit = (Button) view.findViewById(R.id.btn_submit);
-        tv_check_connection = (TextView) view.findViewById(R.id.tv_check_connection);
+        submit = view.findViewById(R.id.btn_submit);
+        tv_check_connection = view.findViewById(R.id.tv_check_connection);
         mNetworkReceiver = new NetworkChangeReceiver();
         Bundle bundle = getArguments();
-
-        subdivspinner = (Spinner) view.findViewById(R.id.subdiv_spin);
+        subdivspinner = view.findViewById(R.id.subdiv_spin);
         role_list = new ArrayList<>();
         roleAdapter = new SpinnerAdapter(role_list, getSetValues, getActivity());
         subdivspinner.setAdapter(roleAdapter);
-
-        sendingData = new SendingData(getContext());
-
+        sendingData = new SendingData(Objects.requireNonNull(getContext()));
         progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
-        progressDialog.setTitle("Checking Credentials");
+        progressDialog.setTitle("Fetching Subdivisions");
         progressDialog.setMessage("Please Wait..");
         progressDialog.show();
-
         SendingData.SendSubdivCodeRequest sendSubdivCodeRequest = sendingData.new SendSubdivCodeRequest(handler, role_list, getSetValues, roleAdapter);
         sendSubdivCodeRequest.execute();
-
         subdivspinner.setSelection(0);
-
         if (bundle != null) {
             dum = bundle.getString("date");
             dd = bundle.getString("dd");
             day = bundle.getString("daycount");
             flag = bundle.getString("flag");
         }
-
         subdivspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TextView tvrole2 = (TextView) view.findViewById(R.id.spinner_txt);
+                TextView tvrole2 = view.findViewById(R.id.spinner_txt);
                 String role = tvrole2.getText().toString();
                 main_role = role;
                 if (main_role.equals("540001 - CITY SUB-DIVISION-3 HUBLI")) {
@@ -213,7 +210,8 @@ public class SelectSubdivision extends Fragment {
                     main_role = "540071";
                 } else if (main_role.equals("540072 - MUDHOL SUB-DIVISION")) {
                     main_role = "540072";
-                } else {
+                } else if (main_role.equals("540076 - CITY SUB-DIVISION-4 HUBLI")) {
+                    main_role = "540076";
                 }
             }
 
@@ -234,14 +232,14 @@ public class SelectSubdivision extends Fragment {
                     bundle.putString("dd", dd);
                     bundle.putString("daycount", day);
                     showMrDetails.setArguments(bundle);
-                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                     fragmentTransaction.replace(R.id.container_main, showMrDetails).addToBackStack(null).commit();
                 } else if (flag.equals("Two")) {
                     SummaryFragment summaryFragment = new SummaryFragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("subdivcode", main_role);
                     summaryFragment.setArguments(bundle);
-                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                     fragmentTransaction.replace(R.id.container_main, summaryFragment).addToBackStack(null).commit();
 
                 } else if (flag.equals("Three")) {
@@ -249,14 +247,14 @@ public class SelectSubdivision extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("subdivcode", main_role);
                     collection.setArguments(bundle);
-                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                     fragmentTransaction.replace(R.id.container_main, collection).addToBackStack(null).commit();
                 } else if (flag.equals("Four")) {
                     MRTrackingFragment mrTrackingFragment = new MRTrackingFragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("subdivcode", main_role);
                     mrTrackingFragment.setArguments(bundle);
-                    fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                     fragmentTransaction.replace(R.id.container_main, mrTrackingFragment).addToBackStack(null).commit();
                 } else {
                     Toast.makeText(getActivity(), "Please select..", Toast.LENGTH_SHORT).show();

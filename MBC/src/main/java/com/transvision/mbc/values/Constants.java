@@ -8,6 +8,7 @@ public class Constants {
     public static String TEST_TRM_URL = "http://test_bc_service.hescomtrm.com/";
     public static String REAL_TRM_URL = "http://bc_service2.hescomtrm.com/";
     public static String REAL_TRM_URL2 = "http://abc_service.hescomtrm.com/";
+    public static String REAL_TRM_URL3 = "http://bc_service.hescomtrm.com/";
     public static String SERVICE = "Service.asmx/";
     public static String SERVICE2 = "TicketingService.asmx/";
     public static String COLLECTION_SERVICE = "Service_Collection.asmx/";
@@ -44,10 +45,4 @@ public class Constants {
     public static final int DOWNLOAD_UPLOAD_APPROVAL_FAILURE = 17;
     public static final int DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS = 18;
     public static final int DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE = 19;
-
-    public static final int UPLOAD_APPROVAL_SUCCESS = 20;
-    public static final int UPLOAD_APPROVAL_FAILURE = 21;
-    public static final int UPLOAD_APPROVAL_GRANT_SUCCESS = 22;
-    public static final int UPLOAD_APPROVAL_GRANT_FAILURE = 24;
-
 }

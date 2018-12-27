@@ -1,5 +1,6 @@
 package com.transvision.mbc.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -33,6 +35,7 @@ import com.transvision.mbc.values.FunctionsCall;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import static com.transvision.mbc.values.Constants.sPref_ROLE;
 
@@ -59,6 +62,7 @@ public class SendSubdivCode extends Fragment {
     Button signal_battery;
     SharedPreferences sPref;
     SharedPreferences.Editor editor;
+
     public SendSubdivCode() {
         // Required empty public constructor
     }
@@ -83,15 +87,12 @@ public class SendSubdivCode extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
-
-        sPref = ((MainActivity) getActivity()).getsharedPref();
+        sPref = ((MainActivity) Objects.requireNonNull(getActivity())).getsharedPref();
         editor = sPref.edit();
         editor.apply();
-
         tv_check_connection = view.findViewById(R.id.tv_check_connection);
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
@@ -103,10 +104,10 @@ public class SendSubdivCode extends Fragment {
         location = view.findViewById(R.id.mr_location_demo);
         mrtracking = view.findViewById(R.id.mr_tracking_btn);
         mrapproval = view.findViewById(R.id.mr_approval);
-        Log.d("debug","ROLE " + sPref.getString(sPref_ROLE, ""));
-        if ( StringUtils.startsWithIgnoreCase(sPref.getString(sPref_ROLE, ""), "AAO")) {
+        Log.d("debug", "ROLE " + sPref.getString(sPref_ROLE, ""));
+        if (StringUtils.startsWithIgnoreCase(sPref.getString(sPref_ROLE, ""), "AAO")) {
             mrapproval.setVisibility(View.VISIBLE);
-        }else  mrapproval.setVisibility(View.INVISIBLE);
+        } else mrapproval.setVisibility(View.INVISIBLE);
 
         functionsCall = new FunctionsCall();
         Bundle bundle = getArguments();
@@ -114,7 +115,7 @@ public class SendSubdivCode extends Fragment {
             subdivisioncode = bundle.getString("subdivcode");
         }
 
-        btn_sendsubdiv_code = (Button) view.findViewById(R.id.subdiv_code_btn);
+        btn_sendsubdiv_code = view.findViewById(R.id.subdiv_code_btn);
         btn_sendsubdiv_code.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,25 +132,21 @@ public class SendSubdivCode extends Fragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 dd = (year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
                                 dum = functionsCall.Parse_Date2(dd);
-
                                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                                 Bundle bundle = new Bundle();
                                 bundle.putString("flag", "One");
                                 bundle.putString("date", dum);
                                 bundle.putString("dd", dd);
                                 bundle.putString("daycount", daycount + "");
-
                                 selectSubdivision.setArguments(bundle);
-                                fragmentTransaction = getFragmentManager().beginTransaction();
+                                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                                 fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
                             }
                         }, mYear, mMonth, mDay);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
-
             }
         });
 
@@ -196,7 +193,7 @@ public class SendSubdivCode extends Fragment {
 
                 selectSubdivision.setArguments(bundle);
 
-                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                 fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
             }
         });
@@ -205,7 +202,7 @@ public class SendSubdivCode extends Fragment {
             @Override
             public void onClick(View v) {
                 DL_MNR_Report dl_mnr_report = new DL_MNR_Report();
-                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                 fragmentTransaction.replace(R.id.container_main, dl_mnr_report).addToBackStack(null).commit();
             }
         });
@@ -222,10 +219,8 @@ public class SendSubdivCode extends Fragment {
                 SelectSubdivision selectSubdivision = new SelectSubdivision();
                 Bundle bundle = new Bundle();
                 bundle.putString("flag", "Three");
-
                 selectSubdivision.setArguments(bundle);
-
-                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                 fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
             }
@@ -241,7 +236,7 @@ public class SendSubdivCode extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("flag", "Four");
                 selectSubdivision.setArguments(bundle);
-                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                 fragmentTransaction.replace(R.id.container_main, selectSubdivision).addToBackStack(null).commit();
 
             }
@@ -258,7 +253,7 @@ public class SendSubdivCode extends Fragment {
             @Override
             public void onClick(View v) {
                 Battery_Signal_Info battery_signal_info = new Battery_Signal_Info();
-                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
                 fragmentTransaction.replace(R.id.container_main, battery_signal_info).addToBackStack(null).commit();
             }
         });
@@ -266,13 +261,14 @@ public class SendSubdivCode extends Fragment {
             @Override
             public void onClick(View view) {
                 MR_Approval mr_approval = new MR_Approval();
-                fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container_main, mr_approval).addToBackStack(null).commit();
+                fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
+                fragmentTransaction.replace(R.id.container_main, mr_approval).commit();
             }
         });
         return view;
     }
 
+    @SuppressLint("SetTextI18n")
     public static void dialog(boolean value) {
         if (value) {
             tv_check_connection.setText("Back Online");
@@ -302,29 +298,18 @@ public class SendSubdivCode extends Fragment {
         }
     }
 
-    private void showdialog(int id) {
-        switch (id) {
-            case DLG_SUCCESS:
-                progressDialog = ProgressDialog.show(getActivity(), "Wait for a second...", "Success", true);
-                break;
-            case DLG_FAILURE:
-                progressDialog = ProgressDialog.show(getActivity(), "Wiat for a second...", "Failure", true);
-                break;
-        }
-    }
-
     private void registerNetworkBroadcastForNougat() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            Objects.requireNonNull(getActivity()).registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getActivity().registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+            Objects.requireNonNull(getActivity()).registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
 
     protected void unregisterNetworkChanges() {
         try {
-            getActivity().unregisterReceiver(mNetworkReceiver);
+            Objects.requireNonNull(getActivity()).unregisterReceiver(mNetworkReceiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -335,4 +320,6 @@ public class SendSubdivCode extends Fragment {
         super.onDestroy();
         unregisterNetworkChanges();
     }
+
+
 }

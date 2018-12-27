@@ -46,8 +46,8 @@
 
     <string-array name="login_role3">
         <item>--SELECT--</item>
-        <item>USER DETAILS</item>
-        <item>AAO</item>
+        <item>ADMIN</item>
+        <item>AAO/AEE</item>
     </string-array>
 
     <string-array name="dl_mnr">

@@ -2,6 +2,7 @@ package com.transvision.mbc.fragments;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,10 @@ public class SummaryDetailsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_summary_details, container, false);
-
         Bundle bundle = getArguments();
         if (bundle != null) {
             division = bundle.getString("subdivcode");
@@ -34,14 +34,14 @@ public class SummaryDetailsFragment extends Fragment {
             from_date = bundle.getString("FROM");
             to_date = bundle.getString("TO");
         }
-        subdivision = (TextView) view.findViewById(R.id.txtsubdivision);
-        totalvalidfile = (TextView) view.findViewById(R.id.txt_totalvalidfile);
-        totaldownload = (TextView) view.findViewById(R.id.txt_totaldownloaded);
-        notdownload = (TextView) view.findViewById(R.id.txt_notdownloaded);
-        upload = (TextView) view.findViewById(R.id.txt_uploaded);
-        notupload = (TextView) view.findViewById(R.id.txt_notuploaded);
-        from = (TextView) view.findViewById(R.id.txt_from);
-        to = (TextView) view.findViewById(R.id.txt_to);
+        subdivision = view.findViewById(R.id.txtsubdivision);
+        totalvalidfile = view.findViewById(R.id.txt_totalvalidfile);
+        totaldownload = view.findViewById(R.id.txt_totaldownloaded);
+        notdownload = view.findViewById(R.id.txt_notdownloaded);
+        upload = view.findViewById(R.id.txt_uploaded);
+        notupload = view.findViewById(R.id.txt_notuploaded);
+        from = view.findViewById(R.id.txt_from);
+        to = view.findViewById(R.id.txt_to);
 
         int totalvalid = Integer.parseInt(valid);
         int totaldown = Integer.parseInt(download);

@@ -60,18 +60,18 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                     case DOWNLOAD_UPLOAD_APPROVAL_SUCCESS:
                         progressDialog.dismiss();
                         approve.setVisibility(View.VISIBLE);
-                        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                         //recyclerView.smoothScrollToPosition(approveAdapter.getItemCount()-1);
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_FAILURE:
                         progressDialog.dismiss();
                         approve.setVisibility(View.INVISIBLE);
-                        Toast.makeText(getActivity(), "Download Approval List Not Found for this Subdivision!!", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM3, getResources().getString(R.string.app_name));
+                        Toast.makeText(getContext(), "Download Approval List Not Found for this Subdivision!!", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM2, getResources().getString(R.string.app_name));
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Approval Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Approval Success", Toast.LENGTH_SHORT).show();
                         //For reloading the current fragment
                         Fragment currentfragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.container_main);
                         FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
@@ -81,7 +81,7 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
                         break;
                 }
                 super.handleMessage(msg);

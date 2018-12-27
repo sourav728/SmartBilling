@@ -2,6 +2,7 @@ package com.transvision.mbc.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -67,10 +68,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Sourav
@@ -80,20 +83,13 @@ public class ShowMrDetails extends Fragment {
     Button pdf;
     TextView show_date, show_subdiv_code, show_mr_count, show_total_records, show_download_count, show_billed_count, show_unbilled_count, holiday;
     FunctionsCall functioncalls;
-
     boolean previous = false, next = false, oncreate = false;
     int count = 0;
-
     ListView lv;
-
     JSONArray arr;
-
     ArrayList<HashMap<String, String>> contactList;
-
     ProgressDialog progressDialog;
-
     LinearLayout linsubdiv, linsubdivhide, table_layout;
-
     String requestUrl = "", subdivisioncode, dum, dd, date;
     int totalmr;
     int total_download = 0, total_billed = 0, total_unbilled = 0, total_records = 0, pd_billed_records = 0, d_billed_records = 0, bip_val =0;
@@ -108,7 +104,6 @@ public class ShowMrDetails extends Fragment {
     GetSetValues getsetvalues;
     ArrayList<GetSetValues> arrayList;
     private MRDetailsAdapter mrdetailsAdapter;
-
     public ShowMrDetails() {
     }
 
@@ -120,42 +115,33 @@ public class ShowMrDetails extends Fragment {
         getActivity().setTitle("MR Time Stamp");
         // pdf = (Button) view.findViewById(R.id.btn_pdf);
 
-        show_date = (TextView) view.findViewById(R.id.txt_showdate);
-        show_subdiv_code = (TextView) view.findViewById(R.id.txt_show_subdiv_code);
-        show_mr_count = (TextView) view.findViewById(R.id.txt_total_mr);
-
-        show_download_count = (TextView) view.findViewById(R.id.txt_total_download);
-        show_billed_count = (TextView) view.findViewById(R.id.txt_total_billed);
-        show_unbilled_count = (TextView) view.findViewById(R.id.txt_total_unbilled);
-        // holiday = (TextView) view.findViewById(R.id.txt_holiday);
-        show_total_records = (TextView) view.findViewById(R.id.txt_total_records);
-
-        table_layout = (LinearLayout) view.findViewById(R.id.lin_table_layout);
-        lv = (ListView) view.findViewById(R.id.list);
+        show_date =  view.findViewById(R.id.txt_showdate);
+        show_subdiv_code =  view.findViewById(R.id.txt_show_subdiv_code);
+        show_mr_count =  view.findViewById(R.id.txt_total_mr);
+        show_download_count =  view.findViewById(R.id.txt_total_download);
+        show_billed_count =  view.findViewById(R.id.txt_total_billed);
+        show_unbilled_count =  view.findViewById(R.id.txt_total_unbilled);
+        // holiday =  view.findViewById(R.id.txt_holiday);
+        show_total_records =  view.findViewById(R.id.txt_total_records);
+        table_layout =  view.findViewById(R.id.lin_table_layout);
+        lv =  view.findViewById(R.id.list);
         getsetvalues = new GetSetValues();
         contactList = new ArrayList<>();
-
-
         arrayList = new ArrayList<>();
-
-        recyclerView = (RecyclerView) view.findViewById(R.id.mrdetails_recyclerview);
+        recyclerView =  view.findViewById(R.id.mrdetails_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setHasFixedSize(true);
         mrdetailsAdapter = new MRDetailsAdapter(getActivity(), arrayList);
-
         //setting the adapter
         recyclerView.setAdapter(mrdetailsAdapter);
-
         Bundle bundle = getArguments();
-
         if (bundle != null) {
             subdivisioncode = bundle.getString("subdivcode");
             dum = bundle.getString("date");
             dd = bundle.getString("dd");
             day = bundle.getString("daycount");
         }
-
-        final BottomNavigationView buttomnavigationview = (BottomNavigationView) view.findViewById(R.id.bottom_navigation);
+        final BottomNavigationView buttomnavigationview =  view.findViewById(R.id.bottom_navigation);
         Menu menunav = buttomnavigationview.getMenu();
 
         buttomnavigationview.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -440,6 +426,11 @@ public class ShowMrDetails extends Fragment {
             datamap.put("Ddate", date);
 
             try {
+                SharedPreferences sharedPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
+                String test_real = sharedPreferences.getString("TEST_REAL_SERVER", "");
+                if (StringUtils.equalsIgnoreCase(test_real,"TEST"))
+                    response = UrlPostConnection("http://test_bc_service2.hescomtrm.com/Service.asmx/BilledUnbilledDetails",datamap);
+                else
                 response = UrlPostConnection("http://bc_service.hescomtrm.com/Service.asmx/BilledUnbilledDetails", datamap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -471,7 +462,7 @@ public class ShowMrDetails extends Fragment {
 
                     //To change the Background of Toast
                     view.setBackgroundColor(Color.TRANSPARENT);
-                    TextView text = (TextView) view.findViewById(android.R.id.message);
+                    TextView text =  view.findViewById(android.R.id.message);
 
                     //Shadow of the Of the Text Color
                     text.setShadowLayer(0, 0, 0, Color.TRANSPARENT);

@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -59,6 +60,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -89,10 +91,10 @@ public class MRTrackingFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case MRTRACKING_SUCCESS:
-                        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                         break;
                     case MRTRACKING_FAILURE:
-                        Toast.makeText(getActivity(), "Failure!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failure!!", Toast.LENGTH_SHORT).show();
                         break;
                 }
                 super.handleMessage(msg);
@@ -104,7 +106,7 @@ public class MRTrackingFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mrtracking, container, false);
         mNetworkReceiver = new NetworkChangeReceiver();
@@ -114,13 +116,13 @@ public class MRTrackingFragment extends Fragment {
             subdivisioncode = bundle.getString("subdivcode");
         arrayList = new ArrayList<>();
         setHasOptionsMenu(true);
-        recyclerView = (RecyclerView) view.findViewById(R.id.mrtrack_recyclerview);
+        recyclerView =  view.findViewById(R.id.mrtrack_recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mrAdapter = new MRAdapter(getActivity(), arrayList, getSetValues);
         recyclerView.setAdapter(mrAdapter);
         functionsCall = new FunctionsCall();
-        sendingData = new SendingData(getContext());
+        sendingData = new SendingData(Objects.requireNonNull(getContext()));
         SendingData.MRTracking mrTracking = sendingData.new MRTracking(handler, arrayList, getSetValues, mrAdapter);
         mrTracking.execute(subdivisioncode);
         return view;
@@ -128,7 +130,7 @@ public class MRTrackingFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuInflater mi = getActivity().getMenuInflater();
+        MenuInflater mi = Objects.requireNonNull(getActivity()).getMenuInflater();
         mi.inflate(R.menu.location,menu);
         MenuItem search = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);

@@ -206,11 +206,10 @@ public class ActivityLogin2 extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-
                 if (tm != null)
-                //    device_id = tm.getDeviceId();
-                  device_id = "357869083548989";
-
+                 device_id = tm.getDeviceId();
+               // device_id = "357869083548989";
+               // device_id = "352514086619271";
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                     if (!StringUtils.startsWithIgnoreCase(login_role, "--SELECT--"))
                         showdialog(DLG_LOGIN);
@@ -221,7 +220,6 @@ public class ActivityLogin2 extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     public void showdialog(int id) {

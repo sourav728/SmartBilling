@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,7 +35,6 @@ import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_FAIL
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE;
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS;
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_SUCCESS;
-import static com.transvision.mbc.values.Constants.sPref_ROLE;
 import static com.transvision.mbc.values.Constants.sPref_SUBDIVISION;
 
 public class Upload_Approval extends Fragment implements View.OnClickListener {
@@ -61,18 +61,18 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                     case DOWNLOAD_UPLOAD_APPROVAL_SUCCESS:
                         progressDialog.dismiss();
                         approve.setVisibility(View.VISIBLE);
-                        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
                         //recyclerView.smoothScrollToPosition(approveAdapter.getItemCount()-1);
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_FAILURE:
                         progressDialog.dismiss();
                         approve.setVisibility(View.INVISIBLE);
-                        Toast.makeText(getActivity(), "Upload Approval List Not Found for this Subdivision!!", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM3, getResources().getString(R.string.app_name));
+                        Toast.makeText(getContext(), "Upload Approval List Not Found for this Subdivision!!", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM2, getResources().getString(R.string.app_name));
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Approval Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Approval Success", Toast.LENGTH_SHORT).show();
                         Fragment currentfragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.container_main);
                         FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
                         fragmenttransaction.detach(currentfragment);
@@ -81,7 +81,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE:
                         progressDialog.dismiss();
-                        Toast.makeText(getActivity(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
                         break;
                 }
                 super.handleMessage(msg);
@@ -93,10 +93,10 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_upload__approval, container, false);
-        sPref = ((MainActivity) getActivity()).getsharedPref();
+        sPref = ((MainActivity) Objects.requireNonNull(getActivity())).getsharedPref();
         editor = sPref.edit();
         editor.apply();
         subdivision = (sPref.getString(sPref_SUBDIVISION, ""));
@@ -111,7 +111,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         approveAdapter = new ApproveAdapter(getActivity(), arrayList, getSetValues);
         recyclerView.setAdapter(approveAdapter);
-        sendingData = new SendingData(getContext());
+        sendingData = new SendingData(Objects.requireNonNull(getContext()));
         setHasOptionsMenu(true);
         progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
         progressDialog.setTitle("Fetching Data");
@@ -124,7 +124,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuInflater mi = getActivity().getMenuInflater();
+        MenuInflater mi = Objects.requireNonNull(getActivity()).getMenuInflater();
         mi.inflate(R.menu.download_upload_approval, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
