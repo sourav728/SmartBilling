@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,14 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.transvision.mbc.fragments.MR_Approval;
 import com.transvision.mbc.fragments.SendSubdivCode;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
-
 import java.util.ArrayList;
-
 import static com.transvision.mbc.values.Constants.PREF_NAME;
 import static com.transvision.mbc.values.Constants.sPref_ROLE;
 import static com.transvision.mbc.values.Constants.sPref_SUBDIVISION;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     FunctionsCall fcall;
     SharedPreferences sPref;
     SharedPreferences.Editor editor;
+    private boolean isFirstBackPressed = false;
     public enum Steps {
         FORM2(SendSubdivCode.class),
         FORM3(MR_Approval.class);
@@ -57,11 +58,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         sPref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         editor = sPref.edit();
         editor.apply();
-
         fcall = new FunctionsCall();
         PackageInfo packageInfo;
         try {
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
         Intent intent = getIntent();
         getSetValues = new GetSetValues();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -82,13 +80,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         subdiv = intent.getExtras().getString("subdivcode");
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -155,11 +151,21 @@ public class MainActivity extends AppCompatActivity
     }
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+        if (getSupportFragmentManager().getBackStackEntryCount() != 0){
             super.onBackPressed();
+        }else{
+            if (isFirstBackPressed) {
+                super.onBackPressed();
+            } else {
+                isFirstBackPressed = true;
+                Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isFirstBackPressed = false;
+                    }
+                }, 1500);
+            }
         }
     }
 
@@ -174,10 +180,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_logout:
                 Intent intent = new Intent(MainActivity.this, ActivityLogin2.class);
                 startActivity(intent);
-                /*SharedPreferences sharedPreferences = getSharedPreferences("MY_SHARED_PREF", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.commit();*/
                 editor.putString(sPref_ROLE,"");
                 editor.putString(sPref_SUBDIVISION,"");
                 editor.clear();
@@ -190,6 +192,4 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
 }

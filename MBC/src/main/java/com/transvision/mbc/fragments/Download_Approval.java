@@ -106,6 +106,7 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_download_approval, container, false);
         sPref = ((MainActivity) getActivity()).getsharedPref();
+        checkbox_selected = false;
         editor = sPref.edit();
         editor.apply();
         subdivision = (sPref.getString(sPref_SUBDIVISION, ""));

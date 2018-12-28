@@ -104,6 +104,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_upload__approval, container, false);
+        checkbox_selected = false;
         sPref = ((MainActivity) Objects.requireNonNull(getActivity())).getsharedPref();
         editor = sPref.edit();
         editor.apply();

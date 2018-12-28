@@ -264,7 +264,7 @@ public class SendSubdivCode extends Fragment{
             public void onClick(View view) {
                 MR_Approval mr_approval = new MR_Approval();
                 fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
-                fragmentTransaction.replace(R.id.container_main, mr_approval).commit();
+                fragmentTransaction.replace(R.id.container_main, mr_approval).addToBackStack(null).commit();
             }
         });
         return view;
