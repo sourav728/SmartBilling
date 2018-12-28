@@ -8,9 +8,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +53,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
     ProgressDialog progressDialog;
     SharedPreferences sPref;
     SharedPreferences.Editor editor;
+    boolean checkbox_selected = false;
     int selectedCount = 0;
 
     {
@@ -68,7 +71,12 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                         progressDialog.dismiss();
                         approve.setVisibility(View.INVISIBLE);
                         Toast.makeText(getContext(), "Upload Approval List Not Found for this Subdivision!!", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM2, getResources().getString(R.string.app_name));
+                        //((MainActivity) Objects.requireNonNull(getActivity())).switchContent(MainActivity.Steps.FORM3, getResources().getString(R.string.app_name));
+                        SendSubdivCode sendSubdivCode = new SendSubdivCode();
+                        FragmentTransaction fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
+                        //For clearing top stack
+                        getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        fragmentTransaction.replace(R.id.container_main, sendSubdivCode).commit();
                         break;
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS:
                         progressDialog.dismiss();
@@ -155,22 +163,30 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
 
     private void postdata() {
         ArrayList<GetSetValues> approvedlist = approveAdapter.getApprovedList();
-        stringBuilder = new StringBuilder();
-        for (int i = 0; i < approvedlist.size(); i++) {
-            GetSetValues getSetValues = approvedlist.get(i);
-            if (getSetValues.isSelected()) {
-                stringBuilder.append(getSetValues.getMrcode()).append("-").append(getSetValues.getDate()).append(",");
+        for (int j = 0; j < approvedlist.size(); j++) {
+            GetSetValues getSetValues1 = approvedlist.get(j);
+            if (getSetValues1.isSelected()) {
+                checkbox_selected = true;
             }
         }
-        Log.d("debug", stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1));
-        mr_list = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
-        progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
-        progressDialog.setTitle("Updating");
-        progressDialog.setMessage("Please Wait..");
-        progressDialog.show();
-        SendingData.MR_Approved mr_approved = sendingData.new MR_Approved(handler);
-        mr_approved.execute(mr_list, "1");
+        if (checkbox_selected) {
+            stringBuilder = new StringBuilder();
+            for (int i = 0; i < approvedlist.size(); i++) {
+                GetSetValues getSetValues = approvedlist.get(i);
+                if (getSetValues.isSelected()) {
+                    stringBuilder.append(getSetValues.getMrcode()).append("-").append(getSetValues.getDate()).append(",");
+                }
+            }
+            //Log.d("debug", stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1));
+            mr_list = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+            progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
+            progressDialog.setTitle("Updating");
+            progressDialog.setMessage("Please Wait..");
+            progressDialog.show();
+            SendingData.MR_Approved mr_approved = sendingData.new MR_Approved(handler);
+            mr_approved.execute(mr_list, "1");
+        } else
+            Toast.makeText(getContext(), "Please select atleast one MR for approval!!", Toast.LENGTH_SHORT).show();
     }
-
 }
 

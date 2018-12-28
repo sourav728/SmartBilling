@@ -4,10 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toolbar;
 
 import com.transvision.mbc.R;
 
@@ -16,7 +18,6 @@ import java.util.Objects;
 public class MR_Approval extends Fragment implements View.OnClickListener {
     Button download_approve, upload_approve;
     FragmentTransaction fragmentTransaction;
-
     public MR_Approval() {
     }
 
@@ -37,12 +38,12 @@ public class MR_Approval extends Fragment implements View.OnClickListener {
             case R.id.btn_download_approval:
                 Download_Approval download_approval = new Download_Approval();
                 fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
-                fragmentTransaction.replace(R.id.container_main, download_approval).commit();
+                fragmentTransaction.replace(R.id.container_main, download_approval).addToBackStack(null).commit();
                 break;
             case R.id.btn_upload_approval:
                 Upload_Approval upload_approval = new Upload_Approval();
                 fragmentTransaction = Objects.requireNonNull(getFragmentManager()).beginTransaction();
-                fragmentTransaction.replace(R.id.container_main, upload_approval).commit();
+                fragmentTransaction.replace(R.id.container_main, upload_approval).addToBackStack(null).commit();
                 break;
         }
     }

@@ -16,6 +16,8 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +44,7 @@ import static com.transvision.mbc.values.Constants.sPref_ROLE;
 /**
  * Created by Sourav on 1/24/2018.
  */
-public class SendSubdivCode extends Fragment {
+public class SendSubdivCode extends Fragment{
 
     private static final int DLG_SUCCESS = 1;
     private static final int DLG_FAILURE = 2;
@@ -62,7 +64,6 @@ public class SendSubdivCode extends Fragment {
     Button signal_battery;
     SharedPreferences sPref;
     SharedPreferences.Editor editor;
-
     public SendSubdivCode() {
         // Required empty public constructor
     }
@@ -90,6 +91,7 @@ public class SendSubdivCode extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_send_subdiv_code, container, false);
+
         sPref = ((MainActivity) Objects.requireNonNull(getActivity())).getsharedPref();
         editor = sPref.edit();
         editor.apply();
@@ -286,6 +288,7 @@ public class SendSubdivCode extends Fragment {
             btn_subdivwise_summary.setEnabled(true);
             collectiondetails.setEnabled(true);
             mrtracking.setEnabled(true);
+            mrapproval.setEnabled(true);
         } else {
             tv_check_connection.setVisibility(View.VISIBLE);
             tv_check_connection.setText("No Internet Connection!!");
@@ -295,6 +298,7 @@ public class SendSubdivCode extends Fragment {
             btn_subdivwise_summary.setEnabled(false);
             collectiondetails.setEnabled(false);
             mrtracking.setEnabled(false);
+            mrapproval.setEnabled(false);
         }
     }
 
@@ -320,6 +324,4 @@ public class SendSubdivCode extends Fragment {
         super.onDestroy();
         unregisterNetworkChanges();
     }
-
-
 }

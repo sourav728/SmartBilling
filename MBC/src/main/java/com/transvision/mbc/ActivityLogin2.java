@@ -208,8 +208,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                 }
                 if (tm != null)
                  device_id = tm.getDeviceId();
-               // device_id = "357869083548989";
-               // device_id = "352514086619271";
+                // device_id = "357869083548989";
+                // device_id = "352514086619271";
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                     if (!StringUtils.startsWithIgnoreCase(login_role, "--SELECT--"))
                         showdialog(DLG_LOGIN);
@@ -239,16 +239,13 @@ public class ActivityLogin2 extends AppCompatActivity {
                 final EditText et_password = dlg_linear.findViewById(R.id.et_login_password);
                 final Button login_btn = dlg_linear.findViewById(R.id.dialog_positive_btn);
                 final Button cancel_btn = dlg_linear.findViewById(R.id.dialog_negative_btn);
-
                 login_dialog = login_dlg.create();
                 login_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
-
                         login_btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
                                 code = et_loginid.getText().toString();
                                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                                     if (!TextUtils.isEmpty(code)) {
@@ -258,7 +255,6 @@ public class ActivityLogin2 extends AppCompatActivity {
                                             progressdialog.setTitle("Checking Credentials");
                                             progressdialog.setMessage("Please Wait..");
                                             progressdialog.show();
-
                                             if (!StringUtils.startsWithIgnoreCase(login_role, "AAO")) {
                                                 SendingData.Login login = sendingData.new Login(getSetValues, handler);
                                                 login.execute(code, password);
@@ -376,5 +372,4 @@ public class ActivityLogin2 extends AppCompatActivity {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (10000), pendingIntent);
         } else fcall.logStatus("Version_receiver Already running..");
     }
-
 }
