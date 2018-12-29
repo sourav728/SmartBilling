@@ -81,6 +81,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS:
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Approval Success", Toast.LENGTH_SHORT).show();
+                        checkbox_selected = false;
                         Fragment currentfragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.container_main);
                         FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
                         fragmenttransaction.detach(currentfragment);
@@ -90,6 +91,7 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE:
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
+                        checkbox_selected = false;
                         break;
                 }
                 super.handleMessage(msg);
@@ -178,7 +180,6 @@ public class Upload_Approval extends Fragment implements View.OnClickListener {
                     stringBuilder.append(getSetValues.getMrcode()).append("-").append(getSetValues.getDate()).append(",");
                 }
             }
-            //Log.d("debug", stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1));
             mr_list = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
             progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
             progressDialog.setTitle("Updating");

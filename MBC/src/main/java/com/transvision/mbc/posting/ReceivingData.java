@@ -18,6 +18,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import static com.transvision.mbc.values.Constants.APPROVAL_NOTIFICATION;
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_FAILURE;
 import static com.transvision.mbc.values.Constants.BILLING_FILE_SUMMARY_SUCCESS;
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_FAILURE;
@@ -282,4 +284,24 @@ public class ReceivingData {
         }
     }
 
+    //Approval Notifications
+    public void get_Approve_Notification(String result, android.os.Handler handler) {
+        //result = parseServerXML(result);
+        JSONArray jsonarray;
+        try {
+            jsonarray = new JSONArray(result);
+            if (jsonarray.length() > 0) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject jsonObject = jsonarray.getJSONObject(i);
+                    String approve = jsonObject.getString("Approval");
+                    Log.d("Debug", "Approve" + approve);
+                    if (!TextUtils.isEmpty(approve)) {
+                        handler.sendEmptyMessage(APPROVAL_NOTIFICATION);
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

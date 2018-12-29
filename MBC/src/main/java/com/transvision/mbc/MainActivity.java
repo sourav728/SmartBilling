@@ -1,6 +1,9 @@
 package com.transvision.mbc;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -19,12 +22,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.transvision.mbc.fragments.MR_Approval;
 import com.transvision.mbc.fragments.SendSubdivCode;
+import com.transvision.mbc.service.MyService;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import static com.transvision.mbc.values.Constants.PREF_NAME;
 import static com.transvision.mbc.values.Constants.sPref_ROLE;
@@ -53,7 +61,6 @@ public class MainActivity extends AppCompatActivity
             return clazz;
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +106,6 @@ public class MainActivity extends AppCompatActivity
         switchContent(Steps.FORM2, getResources().getString(R.string.app_name));
 
     }
-
     public void switchContent(Steps currentForm, String title) {
         try {
             fragment = (Fragment) currentForm.getFragClass().newInstance();
@@ -115,7 +121,6 @@ public class MainActivity extends AppCompatActivity
         ft.replace(R.id.container_main, fragment, currentForm.name());
         ft.commit();
     }
-
     public Fragment getFragment(Steps currentForm) {
         try {
             fragment = (Fragment) currentForm.getFragClass().newInstance();
@@ -124,25 +129,9 @@ public class MainActivity extends AppCompatActivity
         }
         return fragment;
     }
-
     public GetSetValues getSetValues() {
         return this.getSetValues;
     }
-
-    public void switchAddonContent(Steps currentForm, String title) {
-        try {
-            fragment = (Fragment) currentForm.getFragClass().newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        toolbar.setTitle(title);
-        ft.replace(R.id.container_main, fragment, currentForm.name());
-        ft.addToBackStack(null);
-        ft.commit();
-    }
-
     public ArrayList<String> gettabs_list() {
         return this.main_tabs_list;
     }
@@ -164,7 +153,7 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         isFirstBackPressed = false;
                     }
-                }, 1500);
+                }, 2000);
             }
         }
     }
@@ -191,5 +180,29 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    /*    if (StringUtils.startsWithIgnoreCase(sPref.getString(sPref_ROLE, ""), "AAO")) {
+            if (!isMyServiceRunning(MyService.class)) {
+                fcall.logStatus("MyService not running");
+                Intent service = new Intent(MainActivity.this, MyService.class);
+                startService(service);
+            } else fcall.logStatus("MyService Running in background");
+        }*/
+    }
+
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

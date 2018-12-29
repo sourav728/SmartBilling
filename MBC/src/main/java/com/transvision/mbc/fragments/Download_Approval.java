@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,7 +36,6 @@ import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_FAIL
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE;
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS;
 import static com.transvision.mbc.values.Constants.DOWNLOAD_UPLOAD_APPROVAL_SUCCESS;
-import static com.transvision.mbc.values.Constants.sPref_ROLE;
 import static com.transvision.mbc.values.Constants.sPref_SUBDIVISION;
 
 public class Download_Approval extends Fragment implements View.OnClickListener {
@@ -81,6 +79,7 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS:
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Approval Success", Toast.LENGTH_SHORT).show();
+                        checkbox_selected = false;
                         //For reloading the current fragment
                         Fragment currentfragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.container_main);
                         FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
@@ -91,6 +90,7 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                     case DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE:
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Approval Failure!!", Toast.LENGTH_SHORT).show();
+                        checkbox_selected = false;
                         break;
                 }
                 super.handleMessage(msg);
@@ -172,7 +172,6 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                 checkbox_selected = true;
             }
         }
-
         if (checkbox_selected) {
             stringBuilder = new StringBuilder();
             for (int i = 0; i < approvedlist.size(); i++) {
@@ -181,7 +180,6 @@ public class Download_Approval extends Fragment implements View.OnClickListener 
                     stringBuilder.append(getSetValues.getMrcode()).append("-").append(getSetValues.getDate()).append(",");
                 }
             }
-//            Log.d("debug", "substring" + stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1));
             mr_list = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
             progressDialog = new ProgressDialog(getActivity(), R.style.MyProgressDialogstyle);
             progressDialog.setTitle("Updating");

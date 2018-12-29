@@ -12,8 +12,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,13 +20,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -47,9 +42,12 @@ import com.transvision.mbc.other.Apk_Notification;
 import com.transvision.mbc.posting.SendingData;
 import com.transvision.mbc.values.FunctionsCall;
 import com.transvision.mbc.values.GetSetValues;
+
 import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.util.ArrayList;
+
 import static com.transvision.mbc.values.Constants.APK_FILE_DOWNLOADED;
 import static com.transvision.mbc.values.Constants.APK_FILE_NOT_FOUND;
 import static com.transvision.mbc.values.Constants.DLG_APK_NOT_FOUND;
@@ -70,7 +68,7 @@ public class ActivityLogin2 extends AppCompatActivity {
     Button login_btn;
     SharedPreferences sPref;
     SharedPreferences.Editor editor;
-    String group = "", current_version = "", DeviceID = "", login_role = "", device_id="";
+    String group = "", current_version = "", DeviceID = "", login_role = "", device_id = "";
     TextView version_code;
     ProgressDialog progressdialog;
     SendingData sendingData;
@@ -207,9 +205,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                     return;
                 }
                 if (tm != null)
-                 device_id = tm.getDeviceId();
+                    device_id = tm.getDeviceId();
                 // device_id = "357869083548989";
-                // device_id = "352514086619271";
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                     if (!StringUtils.startsWithIgnoreCase(login_role, "--SELECT--"))
                         showdialog(DLG_LOGIN);
@@ -259,8 +256,8 @@ public class ActivityLogin2 extends AppCompatActivity {
                                                 SendingData.Login login = sendingData.new Login(getSetValues, handler);
                                                 login.execute(code, password);
                                             } else {
-                                                SendingData.MR_Login login = sendingData.new MR_Login(handler,getSetValues);
-                                                login.execute(code,device_id, password);
+                                                SendingData.MR_Login login = sendingData.new MR_Login(handler, getSetValues);
+                                                login.execute(code, device_id, password);
                                             }
                                         } else
                                             et_password.setError(getResources().getString(R.string.dialog_login_password_error));
@@ -372,4 +369,5 @@ public class ActivityLogin2 extends AppCompatActivity {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), (10000), pendingIntent);
         } else fcall.logStatus("Version_receiver Already running..");
     }
+
 }

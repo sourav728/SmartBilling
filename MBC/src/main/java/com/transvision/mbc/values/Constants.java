@@ -14,6 +14,7 @@ public class Constants {
     public static String COLLECTION_SERVICE = "Service_Collection.asmx/";
     public static String BILLING_SERVICE = "Service_Billing.asmx/";
     public static String PREF_NAME = "TRM_MBC";
+    public static String LOGIN_CHECK = "LOGIN_CHECK";
     public static String USERNAME = "Username";
     public static String PASSWORD = "Password";
     public static final String sPref_ROLE = "TRM_MBC_role";
@@ -45,4 +46,5 @@ public class Constants {
     public static final int DOWNLOAD_UPLOAD_APPROVAL_FAILURE = 17;
     public static final int DOWNLOAD_UPLOAD_APPROVAL_GRANT_SUCCESS = 18;
     public static final int DOWNLOAD_UPLOAD_APPROVAL_GRANT_FAILURE = 19;
+    public static final int APPROVAL_NOTIFICATION = 20;
 }

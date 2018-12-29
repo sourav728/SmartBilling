@@ -430,4 +430,33 @@ public class SendingData {
             receivingData.get_Approve_Details(result,handler);
         }
     }
+
+    //For Approval Notification
+    public class Approval_Details_Notification extends AsyncTask<String, String, String> {
+        String response = "";
+        Handler handler;
+        String flag="";
+        public Approval_Details_Notification(Handler handler) {
+            this.handler = handler;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            HashMap<String, String> datamap = new HashMap<>();
+            flag = params[1];
+            datamap.put("Subdivision", params[0]);
+            datamap.put("Flag",params[1]);
+            try {
+                response = UrlPostConnection(BASE_BILLING_URL + "Approval_Details", datamap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            receivingData.get_Approve_Notification(result, handler);
+        }
+    }
 }

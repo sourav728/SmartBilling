@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.transvision.mbc">
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -18,7 +17,6 @@
     <!-- Required to show current location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
@@ -28,19 +26,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.transvision.mbc.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.transvision.mbc.SplashActivity"
+            android:name=".SplashActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -63,19 +62,32 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.transvision.mbc.Location"
+            android:name=".Location"
             android:label="@string/title_activity_location" />
-        <activity android:name="com.transvision.mbc.CorporateActivity" />
-        <activity android:name="com.transvision.mbc.SubdivisionActivity" />
-        <activity android:name=".ViewAllLocation"/>
-        <activity android:name=".CollectionLocation"/>
-        <activity android:name="com.transvision.mbc.ActivityLogin2"></activity>
-        <receiver android:name=".other.Apk_Notification"/>
+        <activity android:name=".CorporateActivity" />
+        <activity android:name=".SubdivisionActivity" />
+        <activity android:name=".ViewAllLocation" />
+        <activity android:name=".CollectionLocation" />
+        <activity android:name=".ActivityLogin2" />
+        <receiver android:name=".other.Apk_Notification" />
+        <!--<receiver android:name=".other.Approval_Notification" />-->
         <receiver android:name=".receiver.NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+       <!-- <receiver android:name=".other.WakeUpReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.MyService"
+            android:enabled="true"
+            android:exported="true" />-->
     </application>
 
 </manifest>
