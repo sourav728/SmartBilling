@@ -161,11 +161,10 @@ public class ActivityLogin2 extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
         SavePreferences("TEST_REAL_SERVER", "REAL");
         sendingData = new SendingData(ActivityLogin2.this);
 
-        test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+       /* test_server.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (test_server.isChecked()) {
@@ -176,15 +175,13 @@ public class ActivityLogin2 extends AppCompatActivity {
                     sendingData = new SendingData(ActivityLogin2.this);
                 }
             }
-        });
-
+        });*/
         role_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 GetSetValues roledetails = roles_list.get(position);
                 login_role = roledetails.getLogin_role();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
@@ -206,7 +203,7 @@ public class ActivityLogin2 extends AppCompatActivity {
                 }
                 if (tm != null)
                     device_id = tm.getDeviceId();
-                // device_id = "357869083548989";
+                 //device_id = "357869083548989";
                 if (fcall.isInternetOn(ActivityLogin2.this)) {
                     if (!StringUtils.startsWithIgnoreCase(login_role, "--SELECT--"))
                         showdialog(DLG_LOGIN);

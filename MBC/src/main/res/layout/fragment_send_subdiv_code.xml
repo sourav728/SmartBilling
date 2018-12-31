@@ -109,7 +109,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:background="@drawable/mybuton"
-            android:text="MR Approval"
+            android:text="Approval For Upload/Download"
             android:textAllCaps="false"
             android:textStyle="bold" />
 
